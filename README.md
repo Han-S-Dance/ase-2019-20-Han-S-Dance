@@ -15,7 +15,7 @@ So this will work the same as html paragraphs
 
 1. makes it an ordered list
 1. so does this
-    1a. and this
+    1. and this
 
 ```C++
 printf("this is code\n");
@@ -28,3 +28,11 @@ $$
 [hyperlinks work like this](https://www.google.co.uk)
 
 Test ![alt](images/sqrt1.png) This
+
+
+## Tables
+| Heading 1 | Heading A |
+|--------|-----------------|
+|item 1 | is this |
+|item a | is longer|
+--------------------------
