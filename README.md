@@ -1,9 +1,9 @@
-#Han Dance ASE Assignment 
+# Han Dance ASE Assignment 
 
 This is an intro to markdown. We use the # 4 headings.
 
-#Sub heading
-##Sub sub heading
+# Sub heading
+## Sub sub heading
 
 Paragraphs are on different lines.
 
@@ -15,7 +15,7 @@ So this will work the same as html paragraphs
 
 1. makes it an ordered list
 1. so does this
-1a. and this
+    1a. and this
 
 ```C++
 printf("this is code\n");
@@ -24,3 +24,7 @@ printf("this is code\n");
 $$
 \sqrt(-1)
 $$
+
+[hyperlinks work like this](https://www.google.co.uk)
+
+Test ![alt](images/sqrt1.png) This
