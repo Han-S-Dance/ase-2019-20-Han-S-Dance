@@ -8,3 +8,5 @@ QMAKE_CXXFLAGS += -Wall -Wextra
 QMAKE_CXXFLAGS += -g
 INCLUDEPATH+=/usr/local/include
 LIBS+= -L/usr/local/lib -lgtest -lgtest_main -pthread
+include($(HOME)/NGL/UseNGL.pri)
+
