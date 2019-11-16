@@ -17,6 +17,8 @@ class Particle
     ngl::Vec3 lastposition();
     ngl::Vec3 velocity();
 
+    bool operator==(const Particle &_v) const noexcept;
+
 
     void set_position(ngl::Vec3);
     ngl::Vec3 get_position();

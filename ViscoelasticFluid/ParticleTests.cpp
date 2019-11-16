@@ -51,4 +51,10 @@ TEST(Particle, setvelocity)
 
 }
 
+TEST(Particle, compare)
+{
+    Particle p(ngl::Vec3(10,20,30),ngl::Vec3(40,50,60),ngl::Vec3(70,80,90));
+    Particle q(ngl::Vec3(10,20,30),ngl::Vec3(40,50,60),ngl::Vec3(70,80,90));
+    EXPECT_EQ(p,q);
 
+}

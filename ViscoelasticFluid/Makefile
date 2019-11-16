@@ -53,12 +53,19 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = Particle.cpp \
-		ParticleTests.cpp 
+		ParticleTests.cpp \
+		Spring.cpp \
+		SpringTests.cpp 
 OBJECTS       = Particle.o \
-		ParticleTests.o
+		ParticleTests.o \
+		Spring.o \
+		SpringTests.o
 DIST          = .qmake.stash \
-		ViscoelasticFluidTests.pro Particle.h Particle.cpp \
-		ParticleTests.cpp
+		ViscoelasticFluidTests.pro Particle.h \
+		Spring.h Particle.cpp \
+		ParticleTests.cpp \
+		Spring.cpp \
+		SpringTests.cpp
 QMAKE_TARGET  = test
 DESTDIR       = 
 TARGET        = test
@@ -478,8 +485,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Particle.h $(DISTDIR)/
-	$(COPY_FILE) --parents Particle.cpp ParticleTests.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Particle.h Spring.h $(DISTDIR)/
+	$(COPY_FILE) --parents Particle.cpp ParticleTests.cpp Spring.cpp SpringTests.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -550,6 +557,32 @@ ParticleTests.o: ParticleTests.cpp Particle.h \
 		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h \
 		/home/s5213093/NGL/include/ngl/Vec3.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ParticleTests.o ParticleTests.cpp
+
+Spring.o: Spring.cpp Spring.h \
+		/home/s5213093/NGL/include/ngl/NGLStream.h \
+		/home/s5213093/NGL/include/ngl/Types.h \
+		/home/s5213093/NGL/gl3w/gl3w.h \
+		/home/s5213093/NGL/gl3w/glcorearb.h \
+		/home/s5213093/NGL/include/ngl/fmt/format.h \
+		/home/s5213093/NGL/include/ngl/fmt/format.cc \
+		/home/s5213093/NGL/include/ngl/NGLMessage.h \
+		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h \
+		/home/s5213093/NGL/include/ngl/Vec3.h \
+		Particle.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Spring.o Spring.cpp
+
+SpringTests.o: SpringTests.cpp Spring.h \
+		/home/s5213093/NGL/include/ngl/NGLStream.h \
+		/home/s5213093/NGL/include/ngl/Types.h \
+		/home/s5213093/NGL/gl3w/gl3w.h \
+		/home/s5213093/NGL/gl3w/glcorearb.h \
+		/home/s5213093/NGL/include/ngl/fmt/format.h \
+		/home/s5213093/NGL/include/ngl/fmt/format.cc \
+		/home/s5213093/NGL/include/ngl/NGLMessage.h \
+		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h \
+		/home/s5213093/NGL/include/ngl/Vec3.h \
+		Particle.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SpringTests.o SpringTests.cpp
 
 ####### Install
 

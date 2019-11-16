@@ -60,4 +60,12 @@ ngl::Vec3 Particle::get_velocity()
     return m_velocity;
 }
 
-
+//operator overload of == to compare 2 particles.
+bool Particle::operator==(const Particle &_v) const noexcept
+{
+    return (
+                  m_position == _v.m_position &&
+                  m_lastposition == _v.m_lastposition &&
+                  m_velocity == _v.m_velocity
+            );
+}
