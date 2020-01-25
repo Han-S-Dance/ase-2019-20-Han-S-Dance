@@ -56,21 +56,25 @@ SOURCES       = src/main.cpp \
 		src/NGLScene.cpp \
 		src/Particle.cpp \
 		src/Spring.cpp \
+		src/Tank.cpp \
 		src/World.cpp moc/moc_NGLScene.cpp
 OBJECTS       = obj/main.o \
 		obj/NGLScene.o \
 		obj/Particle.o \
 		obj/Spring.o \
+		obj/Tank.o \
 		obj/World.o \
 		obj/moc_NGLScene.o
 DIST          = .qmake.stash \
 		ViscoelasticFluid.pro include/NGLScene.h \
 		include/Particle.h \
 		include/Spring.h \
+		include/Tank.h \
 		include/World.h src/main.cpp \
 		src/NGLScene.cpp \
 		src/Particle.cpp \
 		src/Spring.cpp \
+		src/Tank.cpp \
 		src/World.cpp
 QMAKE_TARGET  = ViscoelasticFluid
 DESTDIR       = 
@@ -499,8 +503,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents include/NGLScene.h include/Particle.h include/Spring.h include/World.h $(DISTDIR)/
-	$(COPY_FILE) --parents src/main.cpp src/NGLScene.cpp src/Particle.cpp src/Spring.cpp src/World.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents include/NGLScene.h include/Particle.h include/Spring.h include/Tank.h include/World.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/main.cpp src/NGLScene.cpp src/Particle.cpp src/Spring.cpp src/Tank.cpp src/World.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -547,6 +551,7 @@ moc/moc_NGLScene.cpp: include/NGLScene.h \
 		/home/s5213093/NGL/include/ngl/NGLMessage.h \
 		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h \
 		/home/s5213093/NGL/include/ngl/Vec3.h \
+		include/Tank.h \
 		/home/s5213093/NGL/include/ngl/Mat4.h \
 		/opt/Qt5.12.3/5.12.3/gcc_64/include/QtGui/QOpenGLWindow \
 		/opt/Qt5.12.3/5.12.3/gcc_64/include/QtGui/qopenglwindow.h \
@@ -699,6 +704,7 @@ obj/main.o: src/main.cpp include/NGLScene.h \
 		/home/s5213093/NGL/include/ngl/NGLMessage.h \
 		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h \
 		/home/s5213093/NGL/include/ngl/Vec3.h \
+		include/Tank.h \
 		/home/s5213093/NGL/include/ngl/Mat4.h \
 		/opt/Qt5.12.3/5.12.3/gcc_64/include/QtGui/QOpenGLWindow \
 		/opt/Qt5.12.3/5.12.3/gcc_64/include/QtGui/qopenglwindow.h \
@@ -838,6 +844,7 @@ obj/NGLScene.o: src/NGLScene.cpp include/NGLScene.h \
 		/home/s5213093/NGL/include/ngl/NGLMessage.h \
 		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h \
 		/home/s5213093/NGL/include/ngl/Vec3.h \
+		include/Tank.h \
 		/home/s5213093/NGL/include/ngl/Mat4.h \
 		/opt/Qt5.12.3/5.12.3/gcc_64/include/QtGui/QOpenGLWindow \
 		/opt/Qt5.12.3/5.12.3/gcc_64/include/QtGui/qopenglwindow.h \
@@ -1002,6 +1009,17 @@ obj/Spring.o: src/Spring.cpp include/Spring.h \
 		/home/s5213093/NGL/include/ngl/Vec3.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/Spring.o src/Spring.cpp
 
+obj/Tank.o: src/Tank.cpp include/Tank.h \
+		/home/s5213093/NGL/include/ngl/Vec3.h \
+		/home/s5213093/NGL/include/ngl/Types.h \
+		/home/s5213093/NGL/gl3w/gl3w.h \
+		/home/s5213093/NGL/gl3w/glcorearb.h \
+		/home/s5213093/NGL/include/ngl/fmt/format.h \
+		/home/s5213093/NGL/include/ngl/fmt/format.cc \
+		/home/s5213093/NGL/include/ngl/NGLMessage.h \
+		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/Tank.o src/Tank.cpp
+
 obj/World.o: src/World.cpp include/World.h \
 		include/Particle.h \
 		/home/s5213093/NGL/include/ngl/NGLStream.h \
@@ -1013,6 +1031,7 @@ obj/World.o: src/World.cpp include/World.h \
 		/home/s5213093/NGL/include/ngl/NGLMessage.h \
 		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h \
 		/home/s5213093/NGL/include/ngl/Vec3.h \
+		include/Tank.h \
 		/home/s5213093/NGL/include/ngl/Random.h \
 		/home/s5213093/NGL/include/ngl/Singleton.h \
 		/home/s5213093/NGL/include/ngl/Vec4.h \

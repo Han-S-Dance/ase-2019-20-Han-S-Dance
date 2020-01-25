@@ -1,7 +1,6 @@
 ﻿#include "Particle.h"
 #include <gtest/gtest.h>
-#include <ngl/NGLStream.h>
-#include <ngl/Vec3.h>
+
 using namespace ::testing;
 // for more details on gtest see here https://github.com/google/googletest/blob/master/googletest/docs/primer.md
 // my lecture https://nccastaff.bournemouth.ac.uk/jmacey/PP/slides/testing/slides.html#/
@@ -32,6 +31,7 @@ TEST(Particle, setposition)
     Particle p;
     p.set_position(ngl::Vec3(10,20,30));
     EXPECT_EQ(p.get_position(),ngl::Vec3(10,20,30));
+    EXPECT_EQ(p.get_position()[0],10);
 }
 
 
@@ -52,4 +52,12 @@ TEST(Particle, setvelocity)
 
 }
 
+TEST(Particle, SetXYZposition)
+{
+    Particle p;
+    p.setX_position(10.0f);
+    p.setY_position(-12.2f);
+    p.setZ_position(-0.1f);
+    EXPECT_EQ(p.get_position(),ngl::Vec3(10.0f,-12.2f,-0.1f));
+}
 

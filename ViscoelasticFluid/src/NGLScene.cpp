@@ -3,13 +3,13 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 #include <QGuiApplication>
-NGLScene::NGLScene() :  m_world(20,ngl::Vec3(0.0f,0.2f,0.0f))
+NGLScene::NGLScene() :  m_world(200,ngl::Vec3(2.5f,7.0f,0.0f))
 {
     setTitle( "Viscoelastic Fluid Simulation Demo" );
 }
 void NGLScene::resizeGL( int _w, int _h )
 {
-    m_projection=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.1f, 200.0f );
+    m_projection=ngl::perspective( 13.0f, static_cast<float>( _w ) / _h, 1.0f, 200.0f );
 }
 void NGLScene::initializeGL()
 {
@@ -20,11 +20,11 @@ void NGLScene::initializeGL()
     glEnable( GL_BLEND );
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    ngl::Vec3 eye{ 28.0f, 20.0f, 28.0f };
+    ngl::Vec3 eye{ 60.0f, 60.0f, 60.0f };
     m_view=ngl::lookAt(eye,ngl::Vec3::zero(),ngl::Vec3::up());
     ngl::VAOPrimitives *prim =  ngl::VAOPrimitives::instance();
-    prim->createSphere("ball", 0.1f, 20);
-   // prim->creatE("case", 20, 80);
+    prim->createSphere("particle", 0.05f, 20);
+    prim->createSphere("Tank", m_world._tank.radius, 80);
 
     startTimer(1);
 }
@@ -47,6 +47,12 @@ void NGLScene::paintGL()
 
   ngl::VAOPrimitives* prim = ngl::VAOPrimitives::instance();
 
+  glPolygonMode( GL_FRONT_AND_BACK, GL_LINE);
+  m_transform.identity();
+  loadMatricesToShader();
+  shader->setUniform("Colour",0.75f,0.75f,0.75f,0.05f);
+  prim->draw( "Tank" );
+
   glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
 
   for (auto &v:m_world.particle_list)
@@ -56,7 +62,7 @@ void NGLScene::paintGL()
       m_transform.translate(tp.m_x,tp.m_y,tp.m_z);
       shader->setUniform("Colour",0.f,1.f,0.f,1.f);
       loadMatricesToShader();
-      prim->draw( "ball" );
+      prim->draw( "particle" );
 
   }
 }
@@ -79,10 +85,12 @@ void NGLScene::keyPressEvent( QKeyEvent* _event )
 
 void NGLScene::timerEvent(QTimerEvent *)
 {
-     m_world.apply_gravity();
-     m_world.apply_viscosity();
-     m_world.update_position();
-     m_world.predict_velocity();
+    m_world.apply_gravity();
+    m_world.apply_viscosity();
+    m_world.update_position();
+    m_world.double_density_relaxation();
+    m_world.resolve_tank_collision();
+    m_world.predict_velocity();
     update();
 }
 

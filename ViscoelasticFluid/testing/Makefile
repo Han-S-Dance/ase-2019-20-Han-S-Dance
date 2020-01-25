@@ -66,7 +66,8 @@ OBJECTS       = WorldTests.o \
 		Tank.o
 DIST          = ../.qmake.stash \
 		ViscoelasticFluidTests.pro ../include/Particle.h \
-		../include/World.h WorldTests.cpp \
+		../include/World.h \
+		../include/Tank.h WorldTests.cpp \
 		../src/World.cpp \
 		ParticleTests.cpp \
 		../src/Particle.cpp \
@@ -493,7 +494,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../include/Particle.h ../include/World.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../include/Particle.h ../include/World.h ../include/Tank.h $(DISTDIR)/
 	$(COPY_FILE) --parents WorldTests.cpp ../src/World.cpp ParticleTests.cpp ../src/Particle.cpp TankTests.cpp ../src/Tank.cpp $(DISTDIR)/
 
 
@@ -551,7 +552,8 @@ WorldTests.o: WorldTests.cpp ../include/World.h \
 		/home/s5213093/NGL/include/ngl/fmt/format.cc \
 		/home/s5213093/NGL/include/ngl/NGLMessage.h \
 		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h \
-		/home/s5213093/NGL/include/ngl/Vec3.h
+		/home/s5213093/NGL/include/ngl/Vec3.h \
+		../include/Tank.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o WorldTests.o WorldTests.cpp
 
 World.o: ../src/World.cpp ../include/World.h \
@@ -565,6 +567,7 @@ World.o: ../src/World.cpp ../include/World.h \
 		/home/s5213093/NGL/include/ngl/NGLMessage.h \
 		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h \
 		/home/s5213093/NGL/include/ngl/Vec3.h \
+		../include/Tank.h \
 		/home/s5213093/NGL/include/ngl/Random.h \
 		/home/s5213093/NGL/include/ngl/Singleton.h \
 		/home/s5213093/NGL/include/ngl/Vec4.h \
@@ -595,10 +598,26 @@ Particle.o: ../src/Particle.cpp ../include/Particle.h \
 		/home/s5213093/NGL/include/ngl/Vec3.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Particle.o ../src/Particle.cpp
 
-TankTests.o: TankTests.cpp 
+TankTests.o: TankTests.cpp ../include/Tank.h \
+		/home/s5213093/NGL/include/ngl/Vec3.h \
+		/home/s5213093/NGL/include/ngl/Types.h \
+		/home/s5213093/NGL/gl3w/gl3w.h \
+		/home/s5213093/NGL/gl3w/glcorearb.h \
+		/home/s5213093/NGL/include/ngl/fmt/format.h \
+		/home/s5213093/NGL/include/ngl/fmt/format.cc \
+		/home/s5213093/NGL/include/ngl/NGLMessage.h \
+		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TankTests.o TankTests.cpp
 
-Tank.o: ../src/Tank.cpp ../include/Tank.h
+Tank.o: ../src/Tank.cpp ../include/Tank.h \
+		/home/s5213093/NGL/include/ngl/Vec3.h \
+		/home/s5213093/NGL/include/ngl/Types.h \
+		/home/s5213093/NGL/gl3w/gl3w.h \
+		/home/s5213093/NGL/gl3w/glcorearb.h \
+		/home/s5213093/NGL/include/ngl/fmt/format.h \
+		/home/s5213093/NGL/include/ngl/fmt/format.cc \
+		/home/s5213093/NGL/include/ngl/NGLMessage.h \
+		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Tank.o ../src/Tank.cpp
 
 ####### Install

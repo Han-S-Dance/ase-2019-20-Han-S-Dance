@@ -8,7 +8,7 @@
 class Particle
 {
   public :
-    Particle(ngl::Vec3 _position);//, std::map<Particle*,float> _spring);
+    Particle(ngl::Vec3 _position);//
     Particle()=default;
     ~Particle() noexcept =default;
     Particle(const Particle &)=default;
@@ -23,8 +23,12 @@ class Particle
 
     //bool operator==(const Particle &_v) const noexcept;
 
+    //std::map<int,float> _spring;
 
     void set_position(ngl::Vec3);
+    void setX_position(float);
+    void setY_position(float);
+    void setZ_position(float);
     ngl::Vec3 get_position();
     void update_lastposition();
     ngl::Vec3 get_lastposition();
