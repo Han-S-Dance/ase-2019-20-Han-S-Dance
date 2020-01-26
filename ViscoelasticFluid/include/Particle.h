@@ -18,12 +18,8 @@ class Particle
     ngl::Vec3 position();
     ngl::Vec3 lastposition();
     ngl::Vec3 velocity();
-    std::map<Particle*,float> neighbour();
-    std::map<Particle*,float> spring();
 
-    //bool operator==(const Particle &_v) const noexcept;
-
-    //std::map<int,float> _spring;
+    std::map<int,float> _springs;
 
     void set_position(ngl::Vec3);
     void setX_position(float);
@@ -37,13 +33,13 @@ class Particle
 
 
 
+
  private :
 
     ngl::Vec3 m_position;
     ngl::Vec3 m_lastposition;
     ngl::Vec3 m_velocity;
-    std::map<Particle*,float> m_neighbour;
-    std::map<Particle*,float> m_spring;
+
 
 
 };

@@ -11,8 +11,7 @@ TEST(Particle, defaultctor)
     EXPECT_EQ(p.position(),ngl::Vec3());
     EXPECT_EQ(p.lastposition(),ngl::Vec3());
     EXPECT_EQ(p.velocity(),ngl::Vec3());
-    EXPECT_TRUE(p.neighbour().empty());
-    EXPECT_TRUE(p.spring().empty());
+    EXPECT_TRUE(p._springs.empty());
 
 }
 
@@ -61,3 +60,11 @@ TEST(Particle, SetXYZposition)
     EXPECT_EQ(p.get_position(),ngl::Vec3(10.0f,-12.2f,-0.1f));
 }
 
+//TEST(Particle , spring)
+//{
+//    Particle p;
+//    p._springs[6] = 0.9f;
+//    EXPECT_EQ(p._springs[6], 0.9f);
+//    p._springs[6] += 0.2f;
+//    EXPECT_EQ(p._springs[6], 1.1f);
+//}

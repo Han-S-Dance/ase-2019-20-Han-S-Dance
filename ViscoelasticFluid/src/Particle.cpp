@@ -19,16 +19,6 @@ ngl::Vec3 Particle::velocity()
     return m_velocity;
 }
 
-std::map<Particle*,float> Particle::neighbour()
-{
-    return m_neighbour;
-}
-
-
-std::map<Particle*,float> Particle::spring()
-{
-    return m_spring;
-}
 
 Particle::Particle(ngl::Vec3 _position)
 {
@@ -83,12 +73,3 @@ ngl::Vec3 Particle::get_velocity()
     return m_velocity;
 }
 
-//operator overload of == to compare 2 particles.
-//bool Particle::operator==(const Particle &_v) const noexcept
-//{
-//    return (
-//                  m_position == _v.m_position &&
-//                  m_lastposition == _v.m_lastposition &&
-//                  m_velocity == _v.m_velocity
-//            );
-//}

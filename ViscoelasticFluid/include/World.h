@@ -19,17 +19,22 @@ class World
 
     Tank _tank = Tank(9.5f);
 
-    void apply_gravity();
-    void update_position();
-    void predict_velocity();
-
+    ngl::Vec3 between_vector(Particle,Particle);
     void neighbours(unsigned long,unsigned long _flag);
 
-    ngl::Vec3 between_vector(Particle,Particle);
+    void apply_gravity();
 
     float inward_radial_veloctiy(Particle,Particle,ngl::Vec3);
     ngl::Vec3 linear_quadratic_impulses(float,float,ngl::Vec3);
     void apply_viscosity();
+
+    void update_position();
+    void predict_velocity();
+
+    void add_deform_springs(unsigned long);
+    void remove_springs(unsigned long);
+    void adjust_springs();
+    void spring_displacements();
 
     void double_density_relaxation();
 

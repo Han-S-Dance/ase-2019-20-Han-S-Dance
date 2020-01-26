@@ -3,7 +3,7 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 #include <QGuiApplication>
-NGLScene::NGLScene() :  m_world(200,ngl::Vec3(2.5f,7.0f,0.0f))
+NGLScene::NGLScene() :  m_world(100,ngl::Vec3(2.0f,7.0f,0.0f))
 {
     setTitle( "Viscoelastic Fluid Simulation Demo" );
 }
@@ -14,7 +14,7 @@ void NGLScene::resizeGL( int _w, int _h )
 void NGLScene::initializeGL()
 {
     ngl::NGLInit::instance();
-    glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
+    glClearColor( 0.2f, 0.2f, 0.2f, 1.0f );
     glEnable( GL_DEPTH_TEST );
     glEnable( GL_MULTISAMPLE );
     glEnable( GL_BLEND );
@@ -24,9 +24,9 @@ void NGLScene::initializeGL()
     m_view=ngl::lookAt(eye,ngl::Vec3::zero(),ngl::Vec3::up());
     ngl::VAOPrimitives *prim =  ngl::VAOPrimitives::instance();
     prim->createSphere("particle", 0.05f, 20);
-    prim->createSphere("Tank", m_world._tank.radius, 80);
+    prim->createSphere("Tank", m_world._tank.radius, 40);
 
-    startTimer(1);
+    startTimer(10);
 }
 void NGLScene::loadMatricesToShader()
 {
@@ -50,7 +50,7 @@ void NGLScene::paintGL()
   glPolygonMode( GL_FRONT_AND_BACK, GL_LINE);
   m_transform.identity();
   loadMatricesToShader();
-  shader->setUniform("Colour",0.75f,0.75f,0.75f,0.05f);
+  shader->setUniform("Colour",1.0f,1.0f,1.0f,0.04f);
   prim->draw( "Tank" );
 
   glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
@@ -60,7 +60,7 @@ void NGLScene::paintGL()
       m_transform.identity();
       ngl::Vec3 tp = v.get_position();
       m_transform.translate(tp.m_x,tp.m_y,tp.m_z);
-      shader->setUniform("Colour",0.f,1.f,0.f,1.f);
+      shader->setUniform("Colour",0.f,1.f,0.f,0.5f);
       loadMatricesToShader();
       prim->draw( "particle" );
 
@@ -85,9 +85,10 @@ void NGLScene::keyPressEvent( QKeyEvent* _event )
 
 void NGLScene::timerEvent(QTimerEvent *)
 {
-    m_world.apply_gravity();
-    m_world.apply_viscosity();
+    //m_world.apply_gravity();
+    //m_world.apply_viscosity();
     m_world.update_position();
+    //m_world.spring_displacements();
     m_world.double_density_relaxation();
     m_world.resolve_tank_collision();
     m_world.predict_velocity();

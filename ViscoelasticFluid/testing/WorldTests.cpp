@@ -235,5 +235,38 @@ TEST(World, double_denisty)
         w.particle_list[i].set_position(ngl::Vec3(1.0f + i*0.001f, 0.0f, 0.0f));
     }
     w.double_density_relaxation();
-    EXPECT_EQ(w.particle_list[0].get_position(),ngl::Vec3(1.0f,1.0f,1.0f));
+    EXPECT_NE(w.particle_list[0].get_position(),ngl::Vec3(1.0f,1.0f,1.0f));
 }
+
+TEST(World, one_spring)
+{
+    World w(2,ngl::Vec3());
+    w.particle_list[0].set_position(ngl::Vec3());
+    w.particle_list[1].set_position(ngl::Vec3(0.05f,0.0f,0.0f));
+    w.spring_displacements();
+    EXPECT_EQ(w.particle_list[1].get_position(),ngl::Vec3(0.05f,0.0f,0.0f));
+}
+
+TEST(World, remove_springs)
+{
+    World w(2,ngl::Vec3());
+    w.particle_list[0].set_position(ngl::Vec3());
+    w.particle_list[1].set_position(ngl::Vec3(0.1f,0.0f,0.0f));
+    w.add_deform_springs(0);
+    EXPECT_EQ(w.particle_list[0]._springs.size(),1);
+    EXPECT_EQ(w.particle_list[1]._springs.size(),0);
+    w.particle_list[1].set_position(ngl::Vec3(2.01f,0.0f,0.0f));
+    w.remove_springs(0);
+    EXPECT_EQ(w.particle_list[0]._springs.size(),0);
+}
+
+//TEST(World, springs)
+//{
+//    World w(100,ngl::Vec3());
+//    for(unsigned long i = 0; i<w.particle_list.size(); i++) //for each particle in particle_list
+//    {
+//        w.particle_list[i].set_position(ngl::Vec3(0.0f + i*0.001f, i*0.001f, 0.0f));
+//    }
+//    w.spring_displacements();
+//    EXPECT_NE(w.particle_list[50].get_position(),ngl::Vec3(0.05f,0.05f,0.0f));
+//}

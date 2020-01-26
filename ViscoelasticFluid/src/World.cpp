@@ -4,6 +4,7 @@
 #include <ngl/Vec3.h>
 #include <Particle.h>
 #include <ngl/Random.h>
+#include <algorithm>
 #include "Tank.h"
 
 //used a "time step" of 2 here need to update this
@@ -208,5 +209,88 @@ void World:: double_density_relaxation()
             particle_list[i].set_position(particle_list[i].get_position()+dx);
         }
         particle_neighbours.clear();
+    }
+}
+
+void World::add_deform_springs(unsigned long i)
+{
+    neighbours(i,0);
+    if (particle_neighbours.size() > 0)
+    {
+
+        for(unsigned long j = 0; j<particle_neighbours.size(); j++) //for each particle neighbour
+        {
+            if (particle_list[i]._springs.count(static_cast<int>(j)) == 0) //no spring present
+            {
+                unsigned long neigh = particle_neighbours[j]; //index in particle_list
+//                std::cout << "neighbour" << neigh <<std::endl;
+                particle_list[i]._springs[static_cast<int>(neigh)] = 0.1f; //add spring length 0.1f
+//                std::cout << "length 0 to 1 " << particle_list[i]._springs[1] << std::endl;
+            }
+        }
+
+        for(std::map<int,float>::iterator it = particle_list[i]._springs.begin(); it !=particle_list[i]._springs.end(); it++) //iterate over spring map
+        {
+            ngl::Vec3 bv = between_vector(particle_list[i],particle_list[static_cast<unsigned long>(it->first)]);
+            //std::cout << it->first << " The 2 parts of map" << it->second << std::endl;
+            float d = 0.1f*it->second; //yield ratio =0.1
+            float length = bv.length();
+            //std::cout << "L  " << length << std::endl;
+//            std::cout << "L + d " << it->second -d << std::endl;
+            if (length > (it->second + d))
+            {
+                it->second += time_step * 0.3f * (length - it->second - d);   //alpha/plasticity constant =0.3f
+            }
+
+            if (length < (it->second - d))
+            {
+                it->second -= time_step * 0.3f * (it->second - d - length);
+            }
+//            std::cout << "Lij  " << it->second << std::endl;
+        }
+        particle_neighbours.clear();
+    }
+}
+
+void World::remove_springs(unsigned long i)
+{
+   for(std::map<int,float>::iterator it = particle_list[i]._springs.begin(); it != particle_list[i]._springs.end(); it++)
+   {
+       int neigh = it->first;
+       float dist = between_vector(particle_list[i],particle_list[static_cast<unsigned long>(neigh)]).length();
+       if (dist >0.2f)
+       {
+           particle_list[i]._springs.erase(it);
+       }
+   }
+}
+
+
+void World::adjust_springs()
+{
+    for(unsigned long i = 0; i<particle_list.size(); i++)
+    {
+        remove_springs(i);
+
+        add_deform_springs(i);
+    }
+}
+
+void World::spring_displacements()
+{
+    adjust_springs();
+    for(unsigned long i = 0; i<particle_list.size(); i++)
+    {
+        for(std::map<int,float>::iterator it = particle_list[i]._springs.begin(); it !=particle_list[i]._springs.end(); it++)
+        {
+            ngl::Vec3 bv = between_vector(particle_list[i],particle_list[static_cast<unsigned long>(it->first)]);
+//            std::cout << "it first and it second  " << it->first << it->second << std::endl;
+//            std::cout << "bv" << bv << std::endl;
+            ngl::Vec3 D = time_step*time_step*0.3f*(1-(it->second / 0.2f))*(it->second - bv.length())*bv;  //kspring = 0.3f
+//            std::cout << "D" << D/2.0f << std::endl;
+            particle_list[i].set_position(particle_list[i].get_position()-(D/2.0f));
+            particle_list[static_cast<unsigned long>(it->first)].set_position(particle_list[static_cast<unsigned long>(it->first)].get_position()+(D/2.0f));
+//            std::cout << "posn 0" << particle_list[0].get_position() << std::endl;
+        }
     }
 }
