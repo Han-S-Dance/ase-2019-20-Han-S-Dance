@@ -3,7 +3,7 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 #include <QGuiApplication>
-NGLScene::NGLScene() :  m_world(100,ngl::Vec3(2.0f,7.0f,0.0f))
+NGLScene::NGLScene() :  m_world(100,ngl::Vec3(0.0f,8.4f,0.0f))
 {
     setTitle( "Viscoelastic Fluid Simulation Demo" );
 }
@@ -23,10 +23,10 @@ void NGLScene::initializeGL()
     ngl::Vec3 eye{ 60.0f, 60.0f, 60.0f };
     m_view=ngl::lookAt(eye,ngl::Vec3::zero(),ngl::Vec3::up());
     ngl::VAOPrimitives *prim =  ngl::VAOPrimitives::instance();
-    prim->createSphere("particle", 0.05f, 20);
+    prim->createSphere("particle", 0.05f, 10);
     prim->createSphere("Tank", m_world._tank.radius, 40);
 
-    startTimer(10);
+    startTimer(1);
 }
 void NGLScene::loadMatricesToShader()
 {
@@ -50,8 +50,8 @@ void NGLScene::paintGL()
   glPolygonMode( GL_FRONT_AND_BACK, GL_LINE);
   m_transform.identity();
   loadMatricesToShader();
-  shader->setUniform("Colour",1.0f,1.0f,1.0f,0.04f);
-  prim->draw( "Tank" );
+  shader->setUniform("Colour",1.0f,1.0f,1.0f,0.1f);
+  //prim->draw( "Tank" );
 
   glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
 
@@ -85,10 +85,10 @@ void NGLScene::keyPressEvent( QKeyEvent* _event )
 
 void NGLScene::timerEvent(QTimerEvent *)
 {
-    //m_world.apply_gravity();
-    //m_world.apply_viscosity();
+    m_world.apply_gravity();
+    m_world.apply_viscosity();
     m_world.update_position();
-    //m_world.spring_displacements();
+    m_world.spring_displacements();
     m_world.double_density_relaxation();
     m_world.resolve_tank_collision();
     m_world.predict_velocity();

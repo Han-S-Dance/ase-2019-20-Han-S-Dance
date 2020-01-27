@@ -39,6 +39,7 @@ class World
     void double_density_relaxation();
 
     bool outside_tank(Particle);
+    ngl::Vec3 intersection_point(Particle);
     void resolve_tank_collision();
 
 };
