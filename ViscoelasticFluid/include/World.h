@@ -2,6 +2,9 @@
 #define World_H
 #include <Particle.h>
 #include <Tank.h>
+#include <array>
+#include <ngl/Random.h>
+
 
 class World
 {
@@ -15,12 +18,26 @@ class World
     World & operator=(World &&)=default;
 
     std::vector<Particle> particle_list;
-    std::vector<unsigned long> particle_neighbours;
+   // std::vector<unsigned long> particle_neighbours; //get rid of this!
+    const float interaction_radius = 0.2f;
 
-    Tank _tank = Tank(9.5f);
+    Tank _tank = Tank(1.2f);
+    std::vector<std::vector<int>> _spatial_map;
+
+    int hash_function(float _value, float _min_value, float _division_size);
+    void update_map();
+
+    float cube_size = 0.4f;
+    float minx;
+    float miny;
+    float minz;
+    float x_divisions;
+    float y_divisions;
+
+    std::vector<int> map_neighbours(unsigned long i);
+    std::vector<unsigned long> neighbours(unsigned long p,unsigned long _flag);
 
     ngl::Vec3 between_vector(Particle,Particle);
-    void neighbours(unsigned long,unsigned long _flag);
 
     void apply_gravity();
 
