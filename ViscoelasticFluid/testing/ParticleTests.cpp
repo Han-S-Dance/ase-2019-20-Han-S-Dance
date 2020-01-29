@@ -8,9 +8,9 @@ using namespace ::testing;
 TEST(Particle, defaultctor)
 {
     Particle p;
-    EXPECT_EQ(p.position(),ngl::Vec3());
-    EXPECT_EQ(p.lastposition(),ngl::Vec3());
-    EXPECT_EQ(p.velocity(),ngl::Vec3());
+    EXPECT_EQ(p.get_position(),ngl::Vec3());
+    EXPECT_EQ(p.get_lastposition(),ngl::Vec3());
+    EXPECT_EQ(p.get_velocity(),ngl::Vec3());
     EXPECT_TRUE(p._springs.empty());
 
 }

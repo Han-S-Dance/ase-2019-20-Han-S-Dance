@@ -4,12 +4,14 @@
 #include <Tank.h>
 #include <array>
 #include <ngl/Random.h>
+#include <tuple>
+#include <functional>
 
 
 class World
 {
   public:
-    World(unsigned int _num_particles, ngl::Vec3 _posn);
+    World(unsigned int _num_particles);
     World()=default;
     ~World() noexcept =default;
     World(const World &)=default;
@@ -22,9 +24,9 @@ class World
     const float interaction_radius = 0.2f;
 
     Tank _tank;
-    std::vector<std::vector<std::size_t>> _spatial_map;
+    std::map <std::tuple<int,int,int>,std::vector<std::size_t>> _spatial_map;  //ngl::vec3 is key position, elements are list of particles
 
-    std::size_t hash_function(float _value, float _min_value, float _division_size);
+    std::tuple<int,int,int> hash_function(ngl::Vec3 _position);
     void update_map();
 
     float cube_size;

@@ -10,7 +10,7 @@
 static constexpr float time_step = 0.03333333f;
 //const float interaction_radius = 0.2f;
 
-World::World(unsigned int number_particles, ngl::Vec3 particle_position)
+World::World(unsigned int number_particles)
 {
     ngl::Random *rand = ngl::Random::instance();
     rand -> setSeed();
@@ -44,7 +44,6 @@ void World::update_position()
     for(auto &&v : particle_list)
     {
         v.update_lastposition();
-        v.set_velocity(ngl::Vec3::up());
         v.set_position(v.get_position() + time_step * v.get_velocity());
     }
 }
@@ -66,74 +65,53 @@ ngl::Vec3 World::between_vector(Particle p, Particle q) //vector from p to q
 }
 
 
-std::size_t World::hash_function(float _value, float _min_value, float _division_size)
+std::tuple<int,int,int> World::hash_function(ngl::Vec3 _position)
 {
-    float cubes = _value - _min_value;
-    float divisions = 1.f/_division_size;
+    auto hash_x = floor(_position.m_x *(1.0f/cube_size));
+    auto hash_y = floor(_position.m_y *(1.0f/cube_size));
+    auto hash_z = floor(_position.m_z *(1.0f/cube_size));
 
-    auto hash = (cubes*divisions)+0.5f*_division_size;
-    std::cout<< hash << " = " << floor(hash) << " = " << static_cast<std::size_t>(hash) <<std::endl;
-    return static_cast<std::size_t>(hash);
+    return std::make_tuple(hash_x,hash_y,hash_z);
 }
 
 
 void World::update_map()
 {
-    auto minmax_x = std::minmax_element(std::begin(particle_list), std::end(particle_list), [&](const Particle &p1, const Particle &p2)
-                                                                                            {
-                                                                                                return (p1.get_position().m_x < p2.get_position().m_x);
-                                                                                            });
-    auto minmax_y = std::minmax_element(std::begin(particle_list), std::end(particle_list), [&](const Particle &p1, const Particle &p2)
-                                                                                            {
-                                                                                                return (p1.get_position().m_y < p2.get_position().m_y);
-                                                                                            });
-    auto minmax_z = std::minmax_element(std::begin(particle_list), std::end(particle_list), [&](const Particle &p1, const Particle &p2)
-                                                                                            {
-                                                                                                return (p1.get_position().m_z < p2.get_position().m_z);
-                                                                                            });
-
-    minx = minmax_x.first->get_position().m_x;
-    miny = minmax_y.first->get_position().m_y;
-    minz = minmax_z.first->get_position().m_z;
-
-    auto width = minmax_x.second->get_position().m_x - minx;
-    auto height = minmax_y.second->get_position().m_y - miny;
-    auto depth = minmax_z.second->get_position().m_z - minz;
-
-    x_divisions = static_cast<std::size_t>(ceil((width+0.001f) * (1.f/cube_size)));
-    y_divisions = static_cast<std::size_t>(ceil((height+0.001f) * (1.f/cube_size)));
-    std::size_t z_divisions = static_cast<std::size_t>(ceil((depth+0.001f) * (1.f/cube_size)));
-
-    for (auto &&i : _spatial_map)
-        i.clear();
     _spatial_map.clear();
-
-    _spatial_map.resize(x_divisions*y_divisions*z_divisions);
-
-    for(std::size_t i = 0; i<particle_list.size(); i++)
+    for(std::size_t i=0; i<particle_list.size(); i++)
     {
-        auto x = hash_function(particle_list[i].get_position()[0],minx,cube_size);
-        auto y = hash_function(particle_list[i].get_position()[1],miny,cube_size);
-        auto z = hash_function(particle_list[i].get_position()[2],minz,cube_size);
+        auto hash = hash_function(particle_list[i].get_position());
+        auto count = 0;
 
-        std::size_t id = z*y_divisions*x_divisions +y*x_divisions + x; // VERIFY THE ID... WE GOT 237 / 216 once....
-        if (id > _spatial_map.size())
-            std::cout<< "(1) ======================> ERROR! id = " << id <<" / size = " << _spatial_map.size() << std::endl;
-        else
-            _spatial_map[id].emplace_back(i);
+        for (auto it = _spatial_map.begin(); it != _spatial_map.end(); ++it)
+        {
+            if(it->first == hash)
+            {
+                it->second.push_back(i);
+                count++;
+            }
+        }
+
+        if(count == 0)
+        {
+            std::vector<size_t> list;
+            list.push_back(i);
+            _spatial_map.insert(std::make_pair(hash,list));
+
+        }
     }
 }
 
 std::vector<std::size_t> World:: map_neighbours(unsigned long i)
 {
-    auto x = hash_function(particle_list[i].get_position()[0],minx,cube_size);
-    auto y = hash_function(particle_list[i].get_position()[1],miny,cube_size);
-    auto z = hash_function(particle_list[i].get_position()[2],minz,cube_size);
-
-    auto id = z*y_divisions*x_divisions +y*x_divisions + x;
-    if (id > _spatial_map.size())
-        std::cout<< "(2) ======================> ERROR! id = " << id <<" / size = " << _spatial_map.size() << std::endl;
-    return _spatial_map[id];
+    std::vector<std::size_t> neighbours;
+    auto hash = hash_function(particle_list[i].get_position());
+    for (auto it = _spatial_map.begin(); it != _spatial_map.end(); ++it)
+    {
+        if(it->first ==hash)
+        neighbours = it->second;
+    }
+    return neighbours;
 }
 
 
@@ -208,7 +186,6 @@ void World::apply_viscosity()
 }
 
 
-
 bool World::outside_tank(Particle P)
 {
  auto distance = P.get_position().length();
@@ -237,6 +214,7 @@ void World::resolve_tank_collision()
 {
     for(unsigned long i = 0; i<particle_list.size(); i++) //for each particle in particle_list
     {
+
         if (outside_tank(particle_list[i]) == true)
         {
             ngl::Vec3 pos = intersection_point(particle_list[i]);

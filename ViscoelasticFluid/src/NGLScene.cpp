@@ -3,7 +3,7 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 #include <QGuiApplication>
-NGLScene::NGLScene() :  m_world(200,ngl::Vec3(0.0f,0.0f,0.0f))
+NGLScene::NGLScene() :  m_world(800)
 {
     setTitle( "Viscoelastic Fluid Simulation Demo" );
 }
@@ -86,14 +86,14 @@ void NGLScene::keyPressEvent( QKeyEvent* _event )
 
 void NGLScene::timerEvent(QTimerEvent *)
 {
-    m_world.apply_gravity();
+    //m_world.apply_gravity();
     m_world.apply_viscosity();
     m_world.update_position();
-    //m_world.update_map();
-    //m_world.spring_displacements();
-    //m_world.double_density_relaxation();
-    //m_world.resolve_tank_collision();
-    //m_world.predict_velocity();
+    m_world.update_map();
+    m_world.spring_displacements();
+    m_world.double_density_relaxation();
+    m_world.resolve_tank_collision();
+    m_world.predict_velocity();
     update();
 }
 
