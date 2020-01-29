@@ -4,22 +4,6 @@
 #include <ngl/Vec3.h>
 
 
-ngl::Vec3 Particle::position()
-{
-    return m_position;
-}
-
-ngl::Vec3 Particle::lastposition()
-{
-    return m_lastposition;
-}
-
-ngl::Vec3 Particle::velocity()
-{
-    return m_velocity;
-}
-
-
 Particle::Particle(ngl::Vec3 _position)
 {
     m_position=_position;
@@ -45,7 +29,7 @@ void Particle::setZ_position(float _newZ)
     m_position = ngl::Vec3(m_position[0],m_position[1],_newZ);
 }
 
-ngl::Vec3 Particle::get_position()
+const ngl::Vec3 &Particle::get_position() const noexcept
 {
     return m_position;
 }
@@ -68,7 +52,7 @@ void Particle::set_velocity(ngl::Vec3 _newvelocity)
 }
 
 
-ngl::Vec3 Particle::get_velocity()
+const ngl::Vec3 &Particle::get_velocity() const noexcept
 {
     return m_velocity;
 }

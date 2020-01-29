@@ -89,11 +89,11 @@ void NGLScene::timerEvent(QTimerEvent *)
     m_world.apply_gravity();
     m_world.apply_viscosity();
     m_world.update_position();
-    m_world.update_map();
-    m_world.spring_displacements();
-    m_world.double_density_relaxation();
-    m_world.resolve_tank_collision();
-    m_world.predict_velocity();
+    //m_world.update_map();
+    //m_world.spring_displacements();
+    //m_world.double_density_relaxation();
+    //m_world.resolve_tank_collision();
+    //m_world.predict_velocity();
     update();
 }
 

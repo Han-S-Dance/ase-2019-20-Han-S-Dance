@@ -15,9 +15,7 @@ class Particle
     Particle & operator=(const Particle &)=default;
     Particle(Particle &&)=default;
     Particle & operator=(Particle &&)=default;
-    ngl::Vec3 position();
-    ngl::Vec3 lastposition();
-    ngl::Vec3 velocity();
+
 
     std::map<int,float> _springs;
 
@@ -25,11 +23,11 @@ class Particle
     void setX_position(float);
     void setY_position(float);
     void setZ_position(float);
-    ngl::Vec3 get_position();
+    const ngl::Vec3 &get_position() const noexcept;
     void update_lastposition();
     ngl::Vec3 get_lastposition();
     void set_velocity(ngl::Vec3);
-    ngl::Vec3 get_velocity();
+    const ngl::Vec3 &get_velocity() const noexcept;
 
 
 

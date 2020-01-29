@@ -7,26 +7,26 @@
 #include "Tank.h"
 #include <math.h>
 
-const float time_step = 0.03333333f;
+static constexpr float time_step = 0.03333333f;
 //const float interaction_radius = 0.2f;
 
 World::World(unsigned int number_particles, ngl::Vec3 particle_position)
 {
-
     ngl::Random *rand = ngl::Random::instance();
     rand -> setSeed();
 
+    _tank = Tank(1.2f);
+    cube_size = 0.4f;
     for (unsigned int i=0 ;i<number_particles ; ++i)
     {
         float tr = _tank.radius;
-        ngl::Vec3 new_posn = ngl::Vec3() +1.0f*rand->getRandomPoint(tr,tr,tr);
-        while(new_posn.length()>tr)
+        ngl::Vec3 new_posn;
+        do
         {
-            auto updated_posn = ngl::Vec3() +1.0f*rand->getRandomPoint(tr,tr,tr);
-            new_posn = updated_posn;
-        }
+            new_posn = rand->getRandomPoint(tr,tr,tr);
+        } while(new_posn.length()>tr);
 
-        particle_list.push_back(Particle(new_posn));
+        particle_list.emplace_back(new_posn);
     }
 
     update_map();
@@ -35,15 +35,16 @@ World::World(unsigned int number_particles, ngl::Vec3 particle_position)
 
 void World::apply_gravity()
 {
-    for(Particle &v :particle_list)
-        v.set_velocity(v.get_velocity() + time_step* ngl::Vec3(0.0f,-9.8f,0.0f));
+    for(auto &&v :particle_list)
+        v.set_velocity( v.get_velocity() + time_step * ngl::Vec3(0.0f,-9.8f,0.0f) );
 }
 
 void World::update_position()
 {
-    for(Particle &v: particle_list)
+    for(auto &&v : particle_list)
     {
         v.update_lastposition();
+        v.set_velocity(ngl::Vec3::up());
         v.set_position(v.get_position() + time_step * v.get_velocity());
     }
 }
@@ -65,93 +66,91 @@ ngl::Vec3 World::between_vector(Particle p, Particle q) //vector from p to q
 }
 
 
-int World::hash_function(float _value, float _min_value, float _division_size)
+std::size_t World::hash_function(float _value, float _min_value, float _division_size)
 {
-
     float cubes = _value - _min_value;
-    float divisions = 1/_division_size;
+    float divisions = 1.f/_division_size;
 
-    int hash = static_cast<int>(floor((cubes*divisions)+0.5f*_division_size));
-
-    return hash;
+    auto hash = (cubes*divisions)+0.5f*_division_size;
+    std::cout<< hash << " = " << floor(hash) << " = " << static_cast<std::size_t>(hash) <<std::endl;
+    return static_cast<std::size_t>(hash);
 }
 
 
 void World::update_map()
 {
+    auto minmax_x = std::minmax_element(std::begin(particle_list), std::end(particle_list), [&](const Particle &p1, const Particle &p2)
+                                                                                            {
+                                                                                                return (p1.get_position().m_x < p2.get_position().m_x);
+                                                                                            });
+    auto minmax_y = std::minmax_element(std::begin(particle_list), std::end(particle_list), [&](const Particle &p1, const Particle &p2)
+                                                                                            {
+                                                                                                return (p1.get_position().m_y < p2.get_position().m_y);
+                                                                                            });
+    auto minmax_z = std::minmax_element(std::begin(particle_list), std::end(particle_list), [&](const Particle &p1, const Particle &p2)
+                                                                                            {
+                                                                                                return (p1.get_position().m_z < p2.get_position().m_z);
+                                                                                            });
 
-    for(std::vector<int> &i: _spatial_map) //clear the map
-    {
+    minx = minmax_x.first->get_position().m_x;
+    miny = minmax_y.first->get_position().m_y;
+    minz = minmax_z.first->get_position().m_z;
+
+    auto width = minmax_x.second->get_position().m_x - minx;
+    auto height = minmax_y.second->get_position().m_y - miny;
+    auto depth = minmax_z.second->get_position().m_z - minz;
+
+    x_divisions = static_cast<std::size_t>(ceil((width+0.001f) * (1.f/cube_size)));
+    y_divisions = static_cast<std::size_t>(ceil((height+0.001f) * (1.f/cube_size)));
+    std::size_t z_divisions = static_cast<std::size_t>(ceil((depth+0.001f) * (1.f/cube_size)));
+
+    for (auto &&i : _spatial_map)
         i.clear();
-    }
+    _spatial_map.clear();
 
-    std::vector<Particle> sorted_x = particle_list;
-    std::vector<Particle> sorted_y = particle_list;
-    std::vector<Particle> sorted_z = particle_list;
+    _spatial_map.resize(x_divisions*y_divisions*z_divisions);
 
-
-    sort(sorted_x.begin(), sorted_x.end(),[](Particle p, Particle q) {return p.get_position().m_x<q.get_position().m_x;});
-    sort(sorted_y.begin(), sorted_y.end(),[](Particle p, Particle q) {return p.get_position().m_y<q.get_position().m_y;});
-    sort(sorted_z.begin(), sorted_z.end(),[](Particle p, Particle q) {return p.get_position().m_z<q.get_position().m_z;});
-
-    unsigned long list_size = particle_list.size();
-    minx = sorted_x[0].get_position()[0];
-    auto maxx = sorted_x[list_size-1].get_position()[0];
-    miny = sorted_y[0].get_position()[1];
-    auto maxy = sorted_y[list_size-1].get_position()[1];
-    minz = sorted_z[0].get_position()[2];
-    auto maxz = sorted_z[list_size-1].get_position()[2];
-
-    auto width = maxx - minx;
-    auto height = maxy - miny;
-    auto depth = maxz - minz;
-
-    x_divisions = ceil((width+0.001f) * (1/cube_size));
-    y_divisions = ceil((height+0.001f) * (1/cube_size));
-    auto z_divisions = ceil((depth+0.001f) * (1/cube_size));
-
-
-    _spatial_map.resize(static_cast<unsigned long>((x_divisions*y_divisions*z_divisions)));
-
-    for(unsigned long i = 0; i<particle_list.size(); i++)
+    for(std::size_t i = 0; i<particle_list.size(); i++)
     {
-        int x = hash_function(particle_list[i].get_position()[0],minx,cube_size);
-        int y = hash_function(particle_list[i].get_position()[1],miny,cube_size);
-        int z = hash_function(particle_list[i].get_position()[2],minz,cube_size);
+        auto x = hash_function(particle_list[i].get_position()[0],minx,cube_size);
+        auto y = hash_function(particle_list[i].get_position()[1],miny,cube_size);
+        auto z = hash_function(particle_list[i].get_position()[2],minz,cube_size);
 
-        auto id = z*y_divisions*x_divisions +y*x_divisions + x;
-        _spatial_map[static_cast<unsigned long>(id)].push_back(static_cast<int>(i));
-
+        std::size_t id = z*y_divisions*x_divisions +y*x_divisions + x; // VERIFY THE ID... WE GOT 237 / 216 once....
+        if (id > _spatial_map.size())
+            std::cout<< "(1) ======================> ERROR! id = " << id <<" / size = " << _spatial_map.size() << std::endl;
+        else
+            _spatial_map[id].emplace_back(i);
     }
 }
 
-std::vector<int> World:: map_neighbours(unsigned long i)
+std::vector<std::size_t> World:: map_neighbours(unsigned long i)
 {
-    int x = hash_function(particle_list[i].get_position()[0],minx,cube_size);
-    int y = hash_function(particle_list[i].get_position()[1],miny,cube_size);
-    int z = hash_function(particle_list[i].get_position()[2],minz,cube_size);
+    auto x = hash_function(particle_list[i].get_position()[0],minx,cube_size);
+    auto y = hash_function(particle_list[i].get_position()[1],miny,cube_size);
+    auto z = hash_function(particle_list[i].get_position()[2],minz,cube_size);
 
     auto id = z*y_divisions*x_divisions +y*x_divisions + x;
-    std::vector<int> list = _spatial_map[static_cast<unsigned long>(id)];
-    return list;
+    if (id > _spatial_map.size())
+        std::cout<< "(2) ======================> ERROR! id = " << id <<" / size = " << _spatial_map.size() << std::endl;
+    return _spatial_map[id];
 }
 
 
-std::vector<unsigned long> World::neighbours(unsigned long i, unsigned long m_flag) //flag = 0 lists all neighbours after the particle in particle_list & flag = 1 list all neighbours
+std::vector<std::size_t> World::neighbours(std::size_t i, unsigned long _flag) //flag = 0 lists all neighbours after the particle in particle_list & flag = 1 list all neighbours
 {
+    std::vector<std::size_t> neighbours;
+    auto map_neighbour = map_neighbours(i);
 
-    std::vector<unsigned long> neighbours;
-    std::vector<int> same_container = map_neighbours(i);
-
-    for(unsigned long j=0; j<same_container.size() ; ++j)
+    auto neighbour_size = map_neighbour.size();
+    for(std::size_t j=0; j<neighbour_size ; ++j)
     {
-
-        unsigned long particle_id = static_cast<unsigned long>(same_container[j]);
+        auto particle_id = map_neighbour[j];
         if (i == particle_id)
             continue;
         else
         {
-            if((m_flag == 0) && (particle_id<i))
+            if((_flag == 0) && (particle_id<i))
                 continue;
             else
                 {
@@ -181,7 +180,7 @@ void World::apply_viscosity()
 {
     for(unsigned long i = 0; i<particle_list.size(); i++) //for each particle in particle_list
     {
-        std::vector<unsigned long> pneighs = neighbours(i,0);
+        auto pneighs = neighbours(i,0);
         if (pneighs.size() > 0)
         {
             for(unsigned long j = 0; j<pneighs.size(); j++) //for each particle after the chosen particle in the list (pair)

@@ -21,21 +21,21 @@ class World
    // std::vector<unsigned long> particle_neighbours; //get rid of this!
     const float interaction_radius = 0.2f;
 
-    Tank _tank = Tank(1.2f);
-    std::vector<std::vector<int>> _spatial_map;
+    Tank _tank;
+    std::vector<std::vector<std::size_t>> _spatial_map;
 
-    int hash_function(float _value, float _min_value, float _division_size);
+    std::size_t hash_function(float _value, float _min_value, float _division_size);
     void update_map();
 
-    float cube_size = 0.4f;
+    float cube_size;
     float minx;
     float miny;
     float minz;
-    float x_divisions;
-    float y_divisions;
+    std::size_t x_divisions;
+    std::size_t y_divisions;
 
-    std::vector<int> map_neighbours(unsigned long i);
-    std::vector<unsigned long> neighbours(unsigned long p,unsigned long _flag);
+    std::vector<std::size_t> map_neighbours(unsigned long i);
+    std::vector<std::size_t> neighbours(std::size_t i,unsigned long _flag);
 
     ngl::Vec3 between_vector(Particle,Particle);
 
