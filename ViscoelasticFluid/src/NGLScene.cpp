@@ -9,7 +9,9 @@ NGLScene::NGLScene() :  m_world(200)
 }
 void NGLScene::resizeGL( int _w, int _h )
 {
-    m_projection=ngl::perspective( 13.0f, static_cast<float>( _w ) / _h, 1.0f, 200.0f );
+    m_win.width  = static_cast<int>( _w * devicePixelRatio() );
+    m_win.height = static_cast<int>( _h * devicePixelRatio() );
+    m_projection=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.1f, 80.0f );
 }
 void NGLScene::initializeGL()
 {
@@ -20,7 +22,7 @@ void NGLScene::initializeGL()
     glEnable( GL_BLEND );
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    ngl::Vec3 eye{ 7.0f, 7.0f, 7.0f };
+    ngl::Vec3 eye{ 0.0f, 0.0f, -3.9f };
     m_view=ngl::lookAt(eye,ngl::Vec3::zero(),ngl::Vec3::up());
     ngl::VAOPrimitives *prim =  ngl::VAOPrimitives::instance();
     prim->createSphere("particle", 0.012f, 10);
@@ -29,28 +31,37 @@ void NGLScene::initializeGL()
     startTimer(1);
 
 }
-void NGLScene::loadMatricesToShader()
+void NGLScene::loadMatricesToShader(ngl::Transformation &_tx)
 {
   ngl::ShaderLib* shader = ngl::ShaderLib::instance();
   shader->use(ngl::nglColourShader);
 
-   ngl::Mat4 MVP = m_projection * m_view * m_transform;
-   shader->setUniform("MVP",MVP);
+   //ngl::Mat4 MVP = m_projection * m_view * m_transform;
+   shader->setUniform("MVP", m_projection*m_view*m_globalMouseTX*_tx.getMatrix());
 
 }
 void NGLScene::paintGL()
 {
-  glViewport( 0, 0, width(), height() );
+  glViewport(0,0,m_win.width,m_win.height);
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   ngl::ShaderLib* shader = ngl::ShaderLib::instance();
   shader ->use(ngl::nglColourShader);
+  ngl::Mat4 rotX,rotY;
+  rotX.rotateX(m_win.spinXFace);
+  rotY.rotateY(m_win.spinYFace);
+  m_globalMouseTX=rotX*rotY;
+  m_globalMouseTX.m_30=m_modelPos.m_x;
+  m_globalMouseTX.m_31=m_modelPos.m_y;
+  m_globalMouseTX.m_32=m_modelPos.m_z;
+
+  ngl::Transformation tx;
 
   ngl::VAOPrimitives* prim = ngl::VAOPrimitives::instance();
 
   glPolygonMode( GL_FRONT_AND_BACK, GL_LINE);
   m_transform.identity();
-  loadMatricesToShader();
+  loadMatricesToShader(tx);
   shader->setUniform("Colour",1.0f,1.0f,1.0f,0.1f);
   prim->draw( "Tank" );
 
@@ -58,15 +69,15 @@ void NGLScene::paintGL()
 
   for (auto &v:m_world.particle_list)
   {
-      m_transform.identity();
-      ngl::Vec3 tp = v.get_position();
-      m_transform.translate(tp.m_x,tp.m_y,tp.m_z);
-      shader->setUniform("Colour",0.2f,0.8f,0.2f,0.5f);
-      loadMatricesToShader();
-      prim->draw( "particle" );
 
+      tx.reset();
+      tx.setPosition(v.get_position());
+      shader->setUniform("Colour",0.2f,0.8f,0.2f,0.5f);
+      loadMatricesToShader(tx);
+      prim->draw( "particle" );
   }
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::keyPressEvent( QKeyEvent* _event )
 {
@@ -96,7 +107,5 @@ void NGLScene::timerEvent(QTimerEvent *)
     m_world.predict_velocity();
     update();
 }
-
-
 
 

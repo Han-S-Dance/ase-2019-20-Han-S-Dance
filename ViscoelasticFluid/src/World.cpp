@@ -23,11 +23,11 @@ World::World(unsigned int number_particles)
     //assign each particle random position and veolcity
     for (unsigned int i=0 ;i<number_particles ; ++i)
     {
-        ngl::Vec3 new_veloc = rand->getRandomPoint(0.01f,0.01f,0.01f);
+        ngl::Vec3 new_veloc = rand->getRandomPoint(0.00f,0.00f,0.00f);
         ngl::Vec3 new_posn;
         do
         {
-            new_posn = rand->getRandomPoint(tr,tr,tr);
+            new_posn = 0.25f*rand->getRandomPoint(tr,tr,tr);
         } while(new_posn.length()>tr);                   //needs to be in sphere
 
         particle_list.push_back(Particle(new_posn,new_veloc));
@@ -217,7 +217,7 @@ ngl::Vec3 World::intersection_point(Particle P)
     auto d2 = L.dot(L) - tca*tca;
     auto thc =0.0f;
     auto check = _tank.radius*_tank.radius -d2;
-    if (check > 0.00001f)
+    if (check > 0.000001f)
     {
         thc = sqrt(check);
     }

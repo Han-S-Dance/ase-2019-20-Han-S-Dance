@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.9.0, 2020-01-29T18:24:04. -->
+<!-- Written by QtCreator 4.9.0, 2020-01-29T19:46:47. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -316,7 +316,7 @@
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseTerminal">false</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory"></value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/s5213093/Desktop/ASE/ase-2019-20-Han-S-Dance/ViscoelasticFluid</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default"></value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>
