@@ -8,7 +8,7 @@
 class Particle
 {
   public :
-    Particle(ngl::Vec3 _position);//
+    Particle(ngl::Vec3 _position, ngl::Vec3 _velocity);
     Particle()=default;
     ~Particle() noexcept =default;
     Particle(const Particle &)=default;

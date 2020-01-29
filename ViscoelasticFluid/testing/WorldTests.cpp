@@ -158,36 +158,11 @@ TEST(World, viscocity)
     w.particle_list[0].set_position(ngl::Vec3(0.0f,0.0f,0.0f));
     w.particle_list[0].set_velocity(ngl::Vec3(1.0f,1.0f,1.0f));
     w.particle_list[1].set_position(ngl::Vec3(0.1f,0.0f,0.0f));
+    w.particle_list[1].set_velocity(ngl::Vec3());
     w.update_map();
     w.apply_viscosity();
     EXPECT_EQ(w.particle_list[0].get_velocity(),ngl::Vec3(0.9975f,1.0f,1.0f));
     EXPECT_EQ(w.particle_list[1].get_velocity(),ngl::Vec3(0.0025f,0.0f,0.0f));
-}
-
-TEST(World, no_viscocity)
-{
-    World w(2);
-    w.particle_list[0].set_position(ngl::Vec3(0.1f,0.0f,0.0f));
-    w.particle_list[0].set_velocity(ngl::Vec3(1.0f,1.0f,1.0f));
-    w.particle_list[0].set_position(ngl::Vec3());
-    w.update_map();
-    w.apply_viscosity();
-    EXPECT_EQ(w.particle_list[0].get_velocity(),ngl::Vec3(1.0f,1.0f,1.0f));
-    EXPECT_EQ(w.particle_list[1].get_velocity(),ngl::Vec3(0.0f,0.0f,0.0f));
-}
-
-TEST(World, viscocity_multiple)
-{
-    World w(10);
-    w.particle_list[0].set_position(ngl::Vec3(0.0f,0.0f,0.0f));
-    w.particle_list[0].set_velocity(ngl::Vec3(1.0f,1.0f,1.0f));
-    w.particle_list[1].set_position(ngl::Vec3(0.1f,0.0f,0.0f));
-    w.particle_list[2].set_position(ngl::Vec3(0.25f,0.0f,0.0f));
-    w.particle_list[2].set_velocity(ngl::Vec3(0.0f,-1.0f,0.0f));
-    w.update_map();
-    w.apply_viscosity();
-    EXPECT_EQ(w.particle_list[0].get_velocity(),ngl::Vec3(0.9975f,1.0f,1.0f));
-    EXPECT_EQ(w.particle_list[1].get_velocity(),ngl::Vec3(0.00249791f,0.0f,0.0f));
 }
 
 TEST(World, outisde_tank)

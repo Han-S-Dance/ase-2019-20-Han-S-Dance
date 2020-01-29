@@ -17,16 +17,20 @@ World::World(unsigned int number_particles)
 
     _tank = Tank(1.2f);
     cube_size = 0.4f;
+
+    float tr = _tank.radius;
+
+    //assign each particle random position and veolcity
     for (unsigned int i=0 ;i<number_particles ; ++i)
     {
-        float tr = _tank.radius;
+        ngl::Vec3 new_veloc = rand->getRandomPoint(0.01f,0.01f,0.01f);
         ngl::Vec3 new_posn;
         do
         {
             new_posn = rand->getRandomPoint(tr,tr,tr);
-        } while(new_posn.length()>tr);
+        } while(new_posn.length()>tr);                   //needs to be in sphere
 
-        particle_list.emplace_back(new_posn);
+        particle_list.push_back(Particle(new_posn,new_veloc));
     }
 
     update_map();
@@ -83,6 +87,10 @@ void World::update_map()
         auto hash = hash_function(particle_list[i].get_position());
         auto count = 0;
 
+        //initialise spatial cubes only when particles are in them - need check if exists or nor
+        //if does not exist create a vector list with the index.
+        //if does exist create push index into i into vector.
+
         for (auto it = _spatial_map.begin(); it != _spatial_map.end(); ++it)
         {
             if(it->first == hash)
@@ -102,6 +110,8 @@ void World::update_map()
     }
 }
 
+
+//gathers all particles in same spatial cube as chosen particle index
 std::vector<std::size_t> World:: map_neighbours(unsigned long i)
 {
     std::vector<std::size_t> neighbours;
@@ -115,7 +125,9 @@ std::vector<std::size_t> World:: map_neighbours(unsigned long i)
 }
 
 
-std::vector<std::size_t> World::neighbours(std::size_t i, unsigned long _flag) //flag = 0 lists all neighbours after the particle in particle_list & flag = 1 list all neighbours
+//finds all neighbours for a particle i
+//flag = 0 lists all neighbours after the particle in particle_list & flag = 1 list all neighbours
+std::vector<std::size_t> World::neighbours(std::size_t i, unsigned long _flag)
 {
     std::vector<std::size_t> neighbours;
     auto map_neighbour = map_neighbours(i);
@@ -132,7 +144,7 @@ std::vector<std::size_t> World::neighbours(std::size_t i, unsigned long _flag) /
                 continue;
             else
                 {
-                    float distance = between_vector(particle_list[i].get_position(),particle_list[particle_id].get_position()).length();
+                    float distance = between_vector(particle_list[i],particle_list[particle_id]).length();
                     if (distance < interaction_radius) //interection radius = 0.2
                         neighbours.push_back(particle_id);
                 }
@@ -148,9 +160,9 @@ float World::inward_radial_veloctiy(Particle p, Particle q, ngl::Vec3 unit_vec)
     return u;
 }
 
-ngl::Vec3 World::linear_quadratic_impulses(float s, float u, ngl::Vec3 bv)
+ngl::Vec3 World::linear_quadratic_impulses(float r, float u, ngl::Vec3 bv)
 {
-    ngl::Vec3 I = time_step*(1.0f-s)*(0.2f*u+0.1f*u*u)*bv;
+    ngl::Vec3 I = time_step*(1.0f-r)*(0.2f*u+0.1f*u*u)*bv;
     return (I/2);
 }
 
@@ -180,7 +192,7 @@ void World::apply_viscosity()
                     }
                 }
             }
-            //pneighs.clear();
+            pneighs.clear();
         }
     }
 }
@@ -195,15 +207,20 @@ bool World::outside_tank(Particle P)
      return false;
 }
 
-
+//sphere and ray interesction formula
 ngl::Vec3 World::intersection_point(Particle P)
 {
     auto L = -1*P.get_lastposition();
-    auto v = between_vector(P.get_lastposition(),P.get_position());
+    auto v = P.get_position() - P.get_lastposition();
     v.normalize();
     auto tca = L.dot(v);
     auto d2 = L.dot(L) - tca*tca;
-    auto thc = sqrt(_tank.radius*_tank.radius -d2);
+    auto thc =0.0f;
+    auto check = _tank.radius*_tank.radius -d2;
+    if (check > 0.00001f)
+    {
+        thc = sqrt(check);
+    }
     auto t = tca + thc;
     auto Collision_Point = (P.get_lastposition() + t*v);
     return Collision_Point;
@@ -217,7 +234,7 @@ void World::resolve_tank_collision()
 
         if (outside_tank(particle_list[i]) == true)
         {
-            ngl::Vec3 pos = intersection_point(particle_list[i]);
+            ngl::Vec3 pos = intersection_point(particle_list[i]);;
             auto container_normal = -1*pos;
             container_normal.normalize();
             auto vel = (pos - particle_list[i].get_lastposition())/time_step;
@@ -274,7 +291,7 @@ void World::double_density_relaxation()
 
             particle_list[i].set_position(particle_list[i].get_position()+dx);
         }
-        //pneighs.clear();
+        pneighs.clear();
     }
 }
 

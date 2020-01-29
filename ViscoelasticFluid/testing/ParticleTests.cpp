@@ -5,6 +5,14 @@ using namespace ::testing;
 // for more details on gtest see here https://github.com/google/googletest/blob/master/googletest/docs/primer.md
 // my lecture https://nccastaff.bournemouth.ac.uk/jmacey/PP/slides/testing/slides.html#/
 
+TEST(Particle, userctor)
+{
+    Particle p(ngl::Vec3(1.0f,-1.0f,0.2f),ngl::Vec3(2.2f,-6.7f,0.0f));
+    EXPECT_EQ(p.get_position(),ngl::Vec3(1.0f,-1.0f,0.2f));
+    EXPECT_EQ(p.get_velocity(),ngl::Vec3(2.2f,-6.7f,0.0f));
+}
+
+
 TEST(Particle, defaultctor)
 {
     Particle p;
@@ -15,15 +23,6 @@ TEST(Particle, defaultctor)
 
 }
 
-//TEST(Particle, userctor)
-//{
-//    Particle p(ngl::Vec3(10,20,30),ngl::Vec3(40,50,60),ngl::Vec3(70,80,90));
-//    EXPECT_EQ(p.position(),ngl::Vec3(10,20,30));
-//    EXPECT_EQ(p.lastposition(),ngl::Vec3(40,50,60));
-//    EXPECT_EQ(p.velocity(),ngl::Vec3(70,80,90));
-
-
-//}
 
 TEST(Particle, setposition)
 {
@@ -60,11 +59,11 @@ TEST(Particle, SetXYZposition)
     EXPECT_EQ(p.get_position(),ngl::Vec3(10.0f,-12.2f,-0.1f));
 }
 
-//TEST(Particle , spring)
-//{
-//    Particle p;
-//    p._springs[6] = 0.9f;
-//    EXPECT_EQ(p._springs[6], 0.9f);
-//    p._springs[6] += 0.2f;
-//    EXPECT_EQ(p._springs[6], 1.1f);
-//}
+TEST(Particle , spring)
+{
+    Particle p;
+    p._springs[6] = 0.9f;
+    EXPECT_EQ(p._springs[6], 0.9f);
+    p._springs[6] += 0.2f;
+    EXPECT_EQ(p._springs[6], 1.1f);
+}

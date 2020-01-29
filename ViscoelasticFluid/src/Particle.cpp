@@ -4,9 +4,10 @@
 #include <ngl/Vec3.h>
 
 
-Particle::Particle(ngl::Vec3 _position)
+Particle::Particle(ngl::Vec3 _position, ngl::Vec3 _velocity)
 {
-    m_position=_position;
+    m_position =_position;
+    m_velocity = _velocity;
 }
 
 void Particle::set_position(ngl::Vec3 _newposition)

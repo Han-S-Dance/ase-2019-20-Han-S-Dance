@@ -3,7 +3,7 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 #include <QGuiApplication>
-NGLScene::NGLScene() :  m_world(800)
+NGLScene::NGLScene() :  m_world(200)
 {
     setTitle( "Viscoelastic Fluid Simulation Demo" );
 }
