@@ -1,11 +1,11 @@
-#include "NGLScene.h"
-#include <QtGui/QGuiApplication>
+#include <QApplication>
 #include <iostream>
+#include "MainWindow.h"
 
 
 int main(int argc, char** argv)
 {
-      QGuiApplication app(argc, argv);
+      //QGuiApplication app(argc, argv);
 
       QSurfaceFormat format;
 
@@ -25,15 +25,15 @@ int main(int argc, char** argv)
       format.setDepthBufferSize(24);
 
       QSurfaceFormat::setDefaultFormat(format);
+      QApplication a(argc, argv);
 
 
-      NGLScene window;
+      MainWindow w;
 
 
       std::cout << "Profile is " << format.majorVersion() << " " << format.minorVersion() << "\n";
       // set the window size
-      window.resize(900, 800);
 
-      window.show();
-      return app.exec();
+      w.show();
+      return a.exec();
 }

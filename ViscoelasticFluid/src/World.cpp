@@ -10,24 +10,36 @@
 static constexpr float time_step = 0.03333333f;
 //const float interaction_radius = 0.2f;
 
-World::World(unsigned int number_particles)
+World::World(unsigned int num_particles, float _spread, bool _randVelocity)
 {
     ngl::Random *rand = ngl::Random::instance();
     rand -> setSeed();
 
     _tank = Tank(1.2f);
-    cube_size = 0.4f;
+    cube_size = 0.6f;
+
+    m_fluidity = 0.3f;
+    m_plasticity = 0.3f;
+    m_elasticity = 0.3f;
+    m_density =3.0f;
+    m_pressure = 0.1f;
+    m_interaction_radius = 0.2f;
+    m_gravityscale = 0.0f;
 
     float tr = _tank.radius;
 
     //assign each particle random position and veolcity
-    for (unsigned int i=0 ;i<number_particles ; ++i)
+    for (unsigned int i=0 ;i<num_particles ; ++i)
     {
-        ngl::Vec3 new_veloc = rand->getRandomPoint(0.00f,0.00f,0.00f);
+        ngl::Vec3 new_veloc;
+        if (_randVelocity == true)
+        {
+             new_veloc = rand->getRandomPoint(0.01f,0.01f,0.01f);
+        }
         ngl::Vec3 new_posn;
         do
         {
-            new_posn = 0.25f*rand->getRandomPoint(tr,tr,tr);
+            new_posn = _spread*rand->getRandomPoint(tr,tr,tr);
         } while(new_posn.length()>tr);                   //needs to be in sphere
 
         particle_list.push_back(Particle(new_posn,new_veloc));
@@ -40,7 +52,7 @@ World::World(unsigned int number_particles)
 void World::apply_gravity()
 {
     for(auto &&v :particle_list)
-        v.set_velocity( v.get_velocity() + time_step * ngl::Vec3(0.0f,-9.8f,0.0f) );
+        v.set_velocity( v.get_velocity() + time_step * ngl::Vec3(0.0f,-9.8f,0.0f) *m_gravityscale );
 }
 
 void World::update_position()
@@ -144,8 +156,9 @@ std::vector<std::size_t> World::neighbours(std::size_t i, unsigned long _flag)
                 continue;
             else
                 {
+
                     float distance = between_vector(particle_list[i],particle_list[particle_id]).length();
-                    if (distance < interaction_radius) //interection radius = 0.2
+                    if (distance < m_interaction_radius) //interection radius = 0.2
                         neighbours.push_back(particle_id);
                 }
         }
@@ -162,12 +175,13 @@ float World::inward_radial_veloctiy(Particle p, Particle q, ngl::Vec3 unit_vec)
 
 ngl::Vec3 World::linear_quadratic_impulses(float r, float u, ngl::Vec3 bv)
 {
-    ngl::Vec3 I = time_step*(1.0f-r)*(0.2f*u+0.1f*u*u)*bv;
+    ngl::Vec3 I = time_step*(1.0f-r)*(m_fluidity*u+0.1f*u*u)*bv;
     return (I/2);
 }
 
 void World::apply_viscosity()
 {
+    std::cout << "applying viscosity "<< std::endl;
     for(unsigned long i = 0; i<particle_list.size(); i++) //for each particle in particle_list
     {
         auto pneighs = neighbours(i,0);
@@ -180,7 +194,7 @@ void World::apply_viscosity()
 
                 if (bv.length() != 0.0f)
                 {
-                    float q = bv.length()/interaction_radius;
+                    float q = bv.length()/m_interaction_radius;
                     bv.normalize();
 
                     float u = inward_radial_veloctiy(particle_list[i], particle_list[neigh], bv);
@@ -249,6 +263,10 @@ void World::resolve_tank_collision()
 
 void World::double_density_relaxation()
 {
+    std::cout << "relaxing "<< std::endl;
+    float near_stiffness = m_pressure/10.0f;
+    float stiffness = m_pressure/25.0f;
+
     for(unsigned long i = 0; i<particle_list.size(); i++)
     {
         float density =0;
@@ -261,13 +279,13 @@ void World::double_density_relaxation()
             {
                 unsigned long neigh = pneighs[j];
                 ngl::Vec3 bv = between_vector(particle_list[i],particle_list[neigh]);
-                float q = bv.length()/interaction_radius;
+                float q = bv.length()/m_interaction_radius;
                 density += (1-q)*(1-q);
                 near_density += (1-q)*(1-q)*(1-q);
             }
 
-            float pressure = 0.004f*(density-3.0f); //rest density = 3.0f & stifness = 0.004
-            float near_pressure = 0.01f*near_density; //stifness near = 0.01
+            float pressure = stiffness*(density-m_density); //rest density = 3.0f & stifness = 0.004
+            float near_pressure = near_stiffness*near_density; //stifness near = 0.01
             ngl::Vec3 dx;
 
             for(unsigned long j = 0; j<pneighs.size(); j++) //for each particle neighbour apply displacements
@@ -280,7 +298,7 @@ void World::double_density_relaxation()
 
                 if (length != 0.0f)
                 {
-                    q = bv.length()/interaction_radius;
+                    q = bv.length()/m_interaction_radius;
                     bv.normalize();
                 }
 
@@ -317,12 +335,12 @@ void World::add_deform_springs(unsigned long i)
             float length = bv.length();
             if (length > (it->second + d))
             {
-                it->second += time_step * 0.3f * (length - it->second - d);   //alpha/plasticity constant =0.3f
+                it->second += time_step * m_plasticity * (length - it->second - d);   //alpha/plasticity constant =0.3f
             }
 
             if (length < (it->second - d))
             {
-                it->second -= time_step * 0.3f * (it->second - d - length);
+                it->second -= time_step * m_plasticity * (it->second - d - length);
             }
         }
         pneighs.clear();
@@ -335,7 +353,7 @@ void World::remove_springs(unsigned long i)
    {
        int neigh = it->first;
        float dist = between_vector(particle_list[i],particle_list[static_cast<unsigned long>(neigh)]).length();
-       if (dist >interaction_radius)
+       if (dist >m_interaction_radius)
        {
            particle_list[i]._springs.erase(it);
        }
@@ -355,15 +373,52 @@ void World::adjust_springs()
 
 void World::spring_displacements()
 {
+        std::cout << "dispalcing springs "<< std::endl;
     adjust_springs();
     for(unsigned long i = 0; i<particle_list.size(); i++)
     {
         for(std::map<int,float>::iterator it = particle_list[i]._springs.begin(); it !=particle_list[i]._springs.end(); it++)
         {
             ngl::Vec3 bv = between_vector(particle_list[i],particle_list[static_cast<unsigned long>(it->first)]);
-            ngl::Vec3 D = time_step*time_step*0.3f*(1-(it->second / interaction_radius))*(it->second - bv.length())*bv;  //kspring = 0.3f
+            ngl::Vec3 D = time_step*time_step*m_elasticity*(1-(it->second / m_interaction_radius))*(it->second - bv.length())*bv;
             particle_list[i].set_position(particle_list[i].get_position()-(D/2.0f));
             particle_list[static_cast<unsigned long>(it->first)].set_position(particle_list[static_cast<unsigned long>(it->first)].get_position()+(D/2.0f));
         }
     }
+}
+
+
+void World::setFluidity(double _f) //_f
+{
+    m_fluidity = static_cast<float>(_f);
+}
+
+void World::setPlasticity(double _p)
+{
+    m_plasticity = static_cast<float>(_p);
+}
+
+void World::setElasticity(double _e)
+{
+    m_elasticity = static_cast<float>(_e);
+}
+
+void World::setDensity(double _d)
+{
+    m_density = static_cast<float>(_d);
+}
+
+void World::setPressure(double _p)
+{
+    m_pressure = static_cast<float>(_p);
+}
+
+void World::setInteractionRadius(double _i)
+{
+    m_interaction_radius =static_cast<float>(_i);
+}
+
+void World::scaleGravity(double _g)
+{
+    m_gravityscale = static_cast<float>(_g);
 }

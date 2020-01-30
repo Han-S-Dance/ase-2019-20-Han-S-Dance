@@ -1,5 +1,3 @@
-
-
 TARGET=ViscoelasticFluid
 
 QT+=gui opengl core
@@ -25,6 +23,7 @@ DESTDIR=./
 OBJECTS_DIR=obj
 MOC_DIR=moc
 
+FORMS+= $$PWD/ui/MainWindow.ui
 OTHER_FILES+= README.md
 
 

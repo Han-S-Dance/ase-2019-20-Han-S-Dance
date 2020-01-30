@@ -1,0 +1,41 @@
+Profile is 4 5
+[33m-------------------------------------------------------------------------------
+[0m[02:47PM] NGL configured with 
+[0m[02:47PM] OpenGL 4.5.0 NVIDIA 430.50
+[0m[02:47PM] GLSL version 4.50 NVIDIA
+[33m-------------------------------------------------------------------------------
+[0m[02:47PM] Compiling Shader nglTextVertex
+[0m[02:47PM] Compiling Shader nglTextFragment
+[0m[02:47PM] linking Shader nglTextShader 
+[37mFOUND UNIFORM BLOCKS 0
+[37mFOUND UNIFORM BLOCKS 0
+[0m[02:47PM] Compiling Shader nglColourVertex
+[0m[02:47PM] Compiling Shader nglColourFragment
+[0m[02:47PM] linking Shader nglColourShader 
+[37mFOUND UNIFORM BLOCKS 0
+[37mFOUND UNIFORM BLOCKS 0
+[0m[02:47PM] Compiling Shader nglDiffuseVertex
+[0m[02:47PM] Compiling Shader nglDiffuseFragment
+[0m[02:47PM] linking Shader nglDiffuseShader 
+[37mFOUND UNIFORM BLOCKS 0
+[37mFOUND UNIFORM BLOCKS 0
+[0m[02:47PM] Compiling Shader nglCheckerVertex
+[0m[02:47PM] Compiling Shader nglCheckerFragment
+[0m[02:47PM] linking Shader nglCheckerShader 
+[37mFOUND UNIFORM BLOCKS 0
+[37mFOUND UNIFORM BLOCKS 0
+[0m[02:47PM] Closing down shader manager
+[0m[02:47PM] removing ShaderProgram nglCheckerShader
+[0m[02:47PM] removing ShaderProgram nglTextShader
+[0m[02:47PM] removing ShaderProgram NULL
+[0m[02:47PM] removing ShaderProgram nglColourShader
+[0m[02:47PM] removing ShaderProgram nglDiffuseShader
+[37mremoving shader nglCheckerFragment
+[37mremoving shader nglCheckerVertex
+[37mremoving shader nglDiffuseVertex
+[37mremoving shader nglDiffuseFragment
+[37mremoving shader nglTextVertex
+[37mremoving shader nglColourFragment
+[37mremoving shader nglTextFragment
+[37mremoving shader nglColourVertex
+[0m[02:47PM] clearing VAOs

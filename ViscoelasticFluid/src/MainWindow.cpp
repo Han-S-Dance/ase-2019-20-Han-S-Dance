@@ -7,23 +7,34 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent), m_ui(new Ui::MainW
 
   m_gl=new  NGLScene(this);
 
-//  m_ui->s_mainWindowGridLayout->addWidget(m_gl,0,0,2,1);
-//  connect(m_ui->m_wireframe,SIGNAL(toggled(bool)),m_gl,SLOT(toggleWireframe(bool)));
-//  // set the rotation signals
-//  connect(m_ui->m_rotationX,SIGNAL(valueChanged(double)),m_gl,SLOT(setXRotation(double)));
-//  connect(m_ui->m_rotationY,SIGNAL(valueChanged(double)),m_gl,SLOT(setYRotation(double)));
-//  connect(m_ui->m_rotationZ,SIGNAL(valueChanged(double)),m_gl,SLOT(setZRotation(double)));
-//  /// set the scale signals
-//  connect(m_ui->m_scaleX,SIGNAL(valueChanged(double)),m_gl,SLOT(setXScale(double)));
-//  connect(m_ui->m_scaleY,SIGNAL(valueChanged(double)),m_gl,SLOT(setYScale(double)));
-//  connect(m_ui->m_scaleZ,SIGNAL(valueChanged(double)),m_gl,SLOT(setZScale(double)));
-//  /// set the position signals
-//  connect(m_ui->m_positionX,SIGNAL(valueChanged(double)),m_gl,SLOT(setXPosition(double)));
-//  connect(m_ui->m_positionY,SIGNAL(valueChanged(double)),m_gl,SLOT(setYPosition(double)));
-//  connect(m_ui->m_positionZ,SIGNAL(valueChanged(double)),m_gl,SLOT(setZPosition(double)));
-//  /// set the combo box index change signal
-//  connect(m_ui->m_objectSelection,SIGNAL(currentIndexChanged(int)),m_gl,SLOT(setObjectMode(int)));
-//  connect(m_ui->m_colour,SIGNAL(clicked()),m_gl,SLOT(setColour()));
+  m_ui->s_mainWindowGridLayout->addWidget(m_gl,0,0,2,2);
+
+
+//  set the generation parameters
+   connect(m_ui->m_particles,SIGNAL(valueChanged(int)),this,SLOT(setParticleNumber(int)));
+   connect(m_ui->m_spread,SIGNAL(valueChanged(double)),this,SLOT(setSpread(double)));
+   connect(m_ui->m_velocity,SIGNAL(toggled(bool)),this,SLOT(setVelocity(bool)));
+
+
+  //set characteristics
+  connect(m_ui->m_fluidity,SIGNAL(valueChanged(double)) ,this,SLOT(setFluidity(double)));
+  connect(m_ui->m_plasticity,SIGNAL(valueChanged(double)),this,SLOT(setPlasticity(double)));
+  connect(m_ui->m_elasticity,SIGNAL(valueChanged(double)),this,SLOT(setElasticity(double)));
+  connect(m_ui->m_pressure,SIGNAL(valueChanged(double)),this,SLOT(setPressure(double)));
+  connect(m_ui->m_density,SIGNAL(valueChanged(double)),this,SLOT(setDensity(double)));
+  connect(m_ui->m_gravity,SIGNAL(valueChanged(double)),this,SLOT(scaleGravity(double)));
+  connect(m_ui->m_ir,SIGNAL(valueChanged(double)),this,SLOT(setInteractionRadius(double)));
+
+  connect(m_ui->m_springs,SIGNAL(toggled(bool)),this,SLOT(toggleSprings(bool)));
+  connect(m_ui->m_relaxation,SIGNAL(toggled(bool)),this,SLOT(toggleRelaxation(bool)));
+  connect(m_ui->m_viscosity,SIGNAL(toggled(bool)),this,SLOT(toggleViscosity(bool)));
+
+
+//  cancel and reset
+  connect(m_ui->m_generate,SIGNAL(clicked(bool)),this,SLOT(generate(bool)));
+  connect(m_ui->m_reset,SIGNAL(clicked(bool)),this,SLOT(stopSimulation(bool)));
+
+
 }
 
 MainWindow::~MainWindow()

@@ -14,10 +14,10 @@ EQ            = =
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT5BUILD -DFMT_HEADER_ONLY -DUSEGLM -DGLM_ENABLE_EXPERIMENTAL -DNGL_DEBUG -DQT_QML_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB
+DEFINES       = -DQT5BUILD -DFMT_HEADER_ONLY -DUSEGLM -DGLM_ENABLE_EXPERIMENTAL -DNGL_DEBUG -DQT_QML_DEBUG -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -std=c++1z -Wall -Wextra -g -march=native -Wno-unused-variable -march=native -g -std=gnu++1y -Wall -W -Wno-unused-parameter -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I+ -I../include -I/public/devel/include -I/home/s5213093/NGL/include -I/home/s5213093/NGL/gl3w -I/opt/Qt5.12.3/5.12.3/gcc_64/include -I/opt/Qt5.12.3/5.12.3/gcc_64/include/QtGui -I/opt/Qt5.12.3/5.12.3/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/linux-g++
+INCPATH       = -I. -I+ -I../include -I/public/devel/include -I/home/s5213093/NGL/include -I/home/s5213093/NGL/gl3w -I/opt/Qt5.12.3/5.12.3/gcc_64/include -I/opt/Qt5.12.3/5.12.3/gcc_64/include/QtOpenGL -I/opt/Qt5.12.3/5.12.3/gcc_64/include/QtWidgets -I/opt/Qt5.12.3/5.12.3/gcc_64/include/QtGui -I/opt/Qt5.12.3/5.12.3/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/linux-g++
 QMAKE         = /opt/Qt5.12.3/5.12.3/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = ViscoelasticFluidTests1.0.0
 DISTDIR = /home/s5213093/Desktop/ASE/ase-2019-20-Han-S-Dance/ViscoelasticFluid/testing/.tmp/ViscoelasticFluidTests1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-z,origin -Wl,-rpath,\$$ORIGIN/L/home/s5213093/NGL/lib -Wl,-rpath,/home/s5213093/NGL/lib -Wl,-rpath,/opt/Qt5.12.3/5.12.3/gcc_64/lib
-LIBS          = $(SUBLIBS) -L/usr/local/lib -lgtest -lgtest_main -pthread -L/home/s5213093/NGL/lib -l NGL -L/opt/Qt5.12.3/5.12.3/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread   
+LIBS          = $(SUBLIBS) -L/usr/local/lib -lgtest -lgtest_main -pthread -L/home/s5213093/NGL/lib -l NGL -L/opt/Qt5.12.3/5.12.3/gcc_64/lib -lQt5OpenGL -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -271,6 +271,7 @@ Makefile: ViscoelasticFluidTests.pro ../.qmake.cache /opt/Qt5.12.3/5.12.3/gcc_64
 		/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/resources.prf \
 		/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/moc.prf \
 		/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/unix/opengl.prf \
+		/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/uic.prf \
 		/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/unix/thread.prf \
 		/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/qmake_use.prf \
 		/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/file_copies.prf \
@@ -279,6 +280,8 @@ Makefile: ViscoelasticFluidTests.pro ../.qmake.cache /opt/Qt5.12.3/5.12.3/gcc_64
 		/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/yacc.prf \
 		/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/lex.prf \
 		ViscoelasticFluidTests.pro \
+		/opt/Qt5.12.3/5.12.3/gcc_64/lib/libQt5OpenGL.prl \
+		/opt/Qt5.12.3/5.12.3/gcc_64/lib/libQt5Widgets.prl \
 		/opt/Qt5.12.3/5.12.3/gcc_64/lib/libQt5Gui.prl \
 		/opt/Qt5.12.3/5.12.3/gcc_64/lib/libQt5Core.prl
 	$(QMAKE) -o Makefile ViscoelasticFluidTests.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
@@ -469,6 +472,7 @@ Makefile: ViscoelasticFluidTests.pro ../.qmake.cache /opt/Qt5.12.3/5.12.3/gcc_64
 /opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/resources.prf:
 /opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/moc.prf:
 /opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/unix/opengl.prf:
+/opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/uic.prf:
 /opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/unix/thread.prf:
 /opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/qmake_use.prf:
 /opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/file_copies.prf:
@@ -477,6 +481,8 @@ Makefile: ViscoelasticFluidTests.pro ../.qmake.cache /opt/Qt5.12.3/5.12.3/gcc_64
 /opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/yacc.prf:
 /opt/Qt5.12.3/5.12.3/gcc_64/mkspecs/features/lex.prf:
 ViscoelasticFluidTests.pro:
+/opt/Qt5.12.3/5.12.3/gcc_64/lib/libQt5OpenGL.prl:
+/opt/Qt5.12.3/5.12.3/gcc_64/lib/libQt5Widgets.prl:
 /opt/Qt5.12.3/5.12.3/gcc_64/lib/libQt5Gui.prl:
 /opt/Qt5.12.3/5.12.3/gcc_64/lib/libQt5Core.prl:
 qmake: FORCE
@@ -532,6 +538,8 @@ compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
+compiler_uic_make_all:
+compiler_uic_clean:
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
 compiler_yacc_impl_make_all:
@@ -553,7 +561,11 @@ WorldTests.o: WorldTests.cpp ../include/World.h \
 		/home/s5213093/NGL/include/ngl/NGLMessage.h \
 		/home/s5213093/NGL/include/ngl/MessageQueue/AbstractMessageConsumer.h \
 		/home/s5213093/NGL/include/ngl/Vec3.h \
-		../include/Tank.h
+		../include/Tank.h \
+		/home/s5213093/NGL/include/ngl/Random.h \
+		/home/s5213093/NGL/include/ngl/Singleton.h \
+		/home/s5213093/NGL/include/ngl/Vec4.h \
+		/home/s5213093/NGL/include/ngl/Vec2.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o WorldTests.o WorldTests.cpp
 
 World.o: ../src/World.cpp ../include/World.h \

@@ -11,7 +11,7 @@
 class World
 {
   public:
-    World(unsigned int _num_particles);
+    World(unsigned int _num_particles, float _spread, bool _randVelocity);
     World()=default;
     ~World() noexcept =default;
     World(const World &)=default;
@@ -21,7 +21,6 @@ class World
 
     std::vector<Particle> particle_list;
    // std::vector<unsigned long> particle_neighbours; //get rid of this!
-    const float interaction_radius = 0.2f;
 
     Tank _tank;
     std::map <std::tuple<int,int,int>,std::vector<std::size_t>> _spatial_map;  //ngl::vec3 is key position, elements are list of particles
@@ -61,7 +60,26 @@ class World
     ngl::Vec3 intersection_point(Particle);
     void resolve_tank_collision();
 
+
+    void setFluidity(double _f);
+    void setPlasticity(double _p);
+    void setElasticity(double _e);
+    void setDensity(double _d);
+    void setPressure(double _p);
+    void setInteractionRadius(double _i);
+    void scaleGravity(double _g);
+
+private:
+
+    float m_fluidity;
+    float m_plasticity;
+    float m_elasticity;
+    float m_density;
+    float m_pressure;
+    float m_interaction_radius;
+    float m_gravityscale;
+
+
 };
 
 #endif
-

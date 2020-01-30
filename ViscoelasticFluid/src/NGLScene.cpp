@@ -3,16 +3,20 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 #include <QGuiApplication>
-NGLScene::NGLScene() :  m_world(200)
+NGLScene::NGLScene( QWidget *_parent ) : QOpenGLWidget( _parent )
 {
-    setTitle( "Viscoelastic Fluid Simulation Demo" );
+  setFocus();
+  this->resize(_parent->size());
+  m_world = World(0,1,false);
 }
+
 void NGLScene::resizeGL( int _w, int _h )
 {
     m_win.width  = static_cast<int>( _w * devicePixelRatio() );
     m_win.height = static_cast<int>( _h * devicePixelRatio() );
     m_projection=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.1f, 80.0f );
 }
+
 void NGLScene::initializeGL()
 {
     ngl::NGLInit::instance();
@@ -28,9 +32,10 @@ void NGLScene::initializeGL()
     prim->createSphere("particle", 0.012f, 10);
     prim->createSphere("Tank", m_world._tank.radius, 40);
 
-    startTimer(1);
+    m_timer =startTimer(1);
 
 }
+
 void NGLScene::loadMatricesToShader(ngl::Transformation &_tx)
 {
   ngl::ShaderLib* shader = ngl::ShaderLib::instance();
@@ -40,6 +45,7 @@ void NGLScene::loadMatricesToShader(ngl::Transformation &_tx)
    shader->setUniform("MVP", m_projection*m_view*m_globalMouseTX*_tx.getMatrix());
 
 }
+
 void NGLScene::paintGL()
 {
   glViewport(0,0,m_win.width,m_win.height);
@@ -68,14 +74,15 @@ void NGLScene::paintGL()
   glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
 
   for (auto &v:m_world.particle_list)
-  {
+    {
 
-      tx.reset();
-      tx.setPosition(v.get_position());
-      shader->setUniform("Colour",0.2f,0.8f,0.2f,0.5f);
-      loadMatricesToShader(tx);
-      prim->draw( "particle" );
-  }
+        tx.reset();
+        tx.setPosition(v.get_position());
+        shader->setUniform("Colour",0.2f,0.8f,0.2f,0.5f);
+        loadMatricesToShader(tx);
+        prim->draw( "particle" );
+    }
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,17 +102,88 @@ void NGLScene::keyPressEvent( QKeyEvent* _event )
 }
 
 
-void NGLScene::timerEvent(QTimerEvent *)
+
+void NGLScene::toggleViscosity(bool _trigger)
 {
-    //m_world.apply_gravity();
-    m_world.apply_viscosity();
+    if (_trigger == true)
+    {
+        m_world.apply_viscosity();
+        m_viscositytoggle = true;
+    }
+    else{m_viscositytoggle = false;}
+}
+
+void NGLScene::toggleSprings(bool _trigger)
+{
+    if (_trigger == true)
+    {
+        m_world.spring_displacements();
+        m_springstoggle = true;
+    }
+    else {m_springstoggle = false;}
+}
+
+void NGLScene::toggleRelaxation(bool _trigger)
+{
+    if (_trigger == true)
+    {
+        m_world.double_density_relaxation();
+        m_relaxtoggle = true;
+    }
+    else {m_relaxtoggle = false;}
+}
+
+
+void NGLScene::stopSimulation(bool _trigger)
+{
+    if (_trigger == false)
+        killTimer(m_timer);
+
+}
+
+void NGLScene::reset(bool _trigger)
+{
+    if (_trigger ==false)
+    {
+        killTimer(m_timer);
+        m_world = World(static_cast<unsigned int>(m_pnumber),m_spread,m_randvelocity);
+        m_timer =startTimer(1);
+    }
+
+}
+
+void NGLScene::particleNumber(int _number)
+{
+
+    m_pnumber = _number;
+
+}
+
+void NGLScene::setSpread(double _s)
+{
+    m_spread = static_cast<float>(_s);
+}
+
+
+void NGLScene::randVelocity(bool _rv)
+{
+    m_randvelocity = _rv;
+}
+
+
+void NGLScene::timerEvent(QTimerEvent *)
+{   
+    reset(m_reset);
+    m_world.apply_gravity();
+    toggleViscosity(m_viscositytoggle);
     m_world.update_position();
     m_world.update_map();
-    m_world.spring_displacements();
-    m_world.double_density_relaxation();
+    toggleSprings(m_springstoggle);
+    toggleRelaxation(m_relaxtoggle);
     m_world.resolve_tank_collision();
     m_world.predict_velocity();
     update();
+    stopSimulation(m_timerstop);
 }
 
 
