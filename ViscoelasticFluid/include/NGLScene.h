@@ -4,7 +4,6 @@
 #include <ngl/Mat4.h>
 #include <ngl/Transformation.h>
 #include <QOpenGLWidget>
-#include <QOpenGLWindow>
 #include <QKeyEvent>
 #include <QTimerEvent>
 #include <memory>
@@ -19,8 +18,6 @@ class NGLScene : public QOpenGLWidget
         ngl::Mat4 m_view;
         ngl::Mat4 m_projection;
         ngl::Mat4 m_transform;
-
-        //World m_world;
         ngl::Vec3 m_modelPos;
         ngl::Mat4 m_globalMouseTX;
 
@@ -42,14 +39,11 @@ class NGLScene : public QOpenGLWidget
         bool m_timerstop = true;
         bool m_randvelocity = true;
 
-
         int m_pnumber;
         int m_reset = true;
         int m_timer;
 
         float m_spread;
-
-
 
     public:
         NGLScene(QWidget *_parent);

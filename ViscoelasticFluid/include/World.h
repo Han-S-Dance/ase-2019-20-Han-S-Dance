@@ -1,63 +1,35 @@
+/// \brief encapsulates the simulation world
+/// \author Han Dance
+/// \version 2.0
+/// \date 30/1/19 Updated layout
+/// Revision History :
+/// Initial Version 10/11/19
+
+
 #ifndef World_H
 #define World_H
 #include <Particle.h>
 #include <Tank.h>
-#include <array>
-#include <ngl/Random.h>
 #include <tuple>
-#include <functional>
-
 
 class World
 {
   public:
-    World(unsigned int _num_particles, float _spread, bool _randVelocity);
+    World(unsigned int _numParticles, float _spread, bool _randVelocity);
     World()=default;
     ~World() noexcept =default;
-    World(const World &)=default;
-    World & operator=(const World &)=default;
-    World(World &&)=default;
-    World & operator=(World &&)=default;
 
     std::vector<Particle> particle_list;
-   // std::vector<unsigned long> particle_neighbours; //get rid of this!
-
     Tank _tank;
-    std::map <std::tuple<int,int,int>,std::vector<std::size_t>> _spatial_map;  //ngl::vec3 is key position, elements are list of particles
+    std::map <std::tuple<int,int,int>,std::vector<std::size_t>> _spatial_map;
 
-    std::tuple<int,int,int> hash_function(ngl::Vec3 _position);
     void update_map();
-
-    float cube_size;
-    float minx;
-    float miny;
-    float minz;
-    std::size_t x_divisions;
-    std::size_t y_divisions;
-
-    std::vector<std::size_t> map_neighbours(unsigned long i);
-    std::vector<std::size_t> neighbours(std::size_t i,unsigned long _flag);
-
-    ngl::Vec3 between_vector(Particle,Particle);
-
     void apply_gravity();
-
-    float inward_radial_veloctiy(Particle,Particle,ngl::Vec3);
-    ngl::Vec3 linear_quadratic_impulses(float,float,ngl::Vec3);
     void apply_viscosity();
-
     void update_position();
     void predict_velocity();
-
-    void add_deform_springs(unsigned long);
-    void remove_springs(unsigned long);
-    void adjust_springs();
     void spring_displacements();
-
     void double_density_relaxation();
-
-    bool outside_tank(Particle);
-    ngl::Vec3 intersection_point(Particle);
     void resolve_tank_collision();
 
 
@@ -69,6 +41,21 @@ class World
     void setInteractionRadius(double _i);
     void scaleGravity(double _g);
 
+    ngl::Vec3 between_vector(Particle,Particle);
+
+    void add_deform_springs(std::size_t);
+    void remove_springs(std::size_t);
+
+    bool outside_tank(Particle);
+    ngl::Vec3 intersection_point(Particle);
+
+    std::vector<std::size_t> map_neighbours(std::size_t i);
+    std::vector<std::size_t> neighbours(std::size_t i,std::size_t _flag);
+
+    std::tuple<int,int,int> hash_function(ngl::Vec3 _position);
+
+    float m_gravityscale;
+
 private:
 
     float m_fluidity;
@@ -77,7 +64,13 @@ private:
     float m_density;
     float m_pressure;
     float m_interaction_radius;
-    float m_gravityscale;
+
+    float cube_size;
+
+    float inward_radial_veloctiy(Particle,Particle,ngl::Vec3);
+    ngl::Vec3 linear_quadratic_impulses(float,float,ngl::Vec3);
+
+    void adjust_springs();
 
 
 };

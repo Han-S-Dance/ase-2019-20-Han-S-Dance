@@ -1,16 +1,17 @@
-﻿#include "World.h"
+﻿///
+///  @file World.cpp
+///  @brief Holds the world of particles and the tank they live in. Calculates everything for the simulation.
+
+#include "World.h"
 #include <iostream>
-#include <ngl/NGLStream.h>
-#include <ngl/Vec3.h>
-#include <Particle.h>
-#include <algorithm>
-#include "Tank.h"
+
+//Additional File Includes
 #include <math.h>
+#include <ngl/Random.h>
 
 static constexpr float time_step = 0.03333333f;
-//const float interaction_radius = 0.2f;
 
-World::World(unsigned int num_particles, float _spread, bool _randVelocity)
+World::World(unsigned int _numParticles, float _spread, bool _randVelocity)
 {
     ngl::Random *rand = ngl::Random::instance();
     rand -> setSeed();
@@ -29,7 +30,8 @@ World::World(unsigned int num_particles, float _spread, bool _randVelocity)
     float tr = _tank.radius;
 
     //assign each particle random position and veolcity
-    for (unsigned int i=0 ;i<num_particles ; ++i)
+    //the position needs be in sphere hence while dolong
+    for (unsigned int i=0 ;i<_numParticles ; ++i)
     {
         ngl::Vec3 new_veloc;
         if (_randVelocity == true)
@@ -40,7 +42,7 @@ World::World(unsigned int num_particles, float _spread, bool _randVelocity)
         do
         {
             new_posn = _spread*rand->getRandomPoint(tr,tr,tr);
-        } while(new_posn.length()>tr);                   //needs to be in sphere
+        } while(new_posn.length()>tr);
 
         particle_list.push_back(Particle(new_posn,new_veloc));
     }
@@ -124,7 +126,7 @@ void World::update_map()
 
 
 //gathers all particles in same spatial cube as chosen particle index
-std::vector<std::size_t> World:: map_neighbours(unsigned long i)
+std::vector<std::size_t> World:: map_neighbours(std::size_t i)
 {
     std::vector<std::size_t> neighbours;
     auto hash = hash_function(particle_list[i].get_position());
@@ -139,7 +141,7 @@ std::vector<std::size_t> World:: map_neighbours(unsigned long i)
 
 //finds all neighbours for a particle i
 //flag = 0 lists all neighbours after the particle in particle_list & flag = 1 list all neighbours
-std::vector<std::size_t> World::neighbours(std::size_t i, unsigned long _flag)
+std::vector<std::size_t> World::neighbours(std::size_t i, std::size_t _flag)
 {
     std::vector<std::size_t> neighbours;
     auto map_neighbour = map_neighbours(i);
@@ -181,15 +183,14 @@ ngl::Vec3 World::linear_quadratic_impulses(float r, float u, ngl::Vec3 bv)
 
 void World::apply_viscosity()
 {
-    std::cout << "applying viscosity "<< std::endl;
-    for(unsigned long i = 0; i<particle_list.size(); i++) //for each particle in particle_list
+    for(std::size_t i = 0; i<particle_list.size(); i++) //for each particle in particle_list
     {
         auto pneighs = neighbours(i,0);
         if (pneighs.size() > 0)
         {
-            for(unsigned long j = 0; j<pneighs.size(); j++) //for each particle after the chosen particle in the list (pair)
+            for(std::size_t j = 0; j<pneighs.size(); j++) //for each particle after the chosen particle in the list (pair)
             {
-                unsigned long neigh = pneighs[j];
+                std::size_t neigh = pneighs[j];
                 ngl::Vec3 bv = between_vector(particle_list[i],particle_list[neigh]);
 
                 if (bv.length() != 0.0f)
@@ -243,7 +244,7 @@ ngl::Vec3 World::intersection_point(Particle P)
 
 void World::resolve_tank_collision()
 {
-    for(unsigned long i = 0; i<particle_list.size(); i++) //for each particle in particle_list
+    for(std::size_t i = 0; i<particle_list.size(); i++) //for each particle in particle_list
     {
 
         if (outside_tank(particle_list[i]) == true)
@@ -263,21 +264,20 @@ void World::resolve_tank_collision()
 
 void World::double_density_relaxation()
 {
-    std::cout << "relaxing "<< std::endl;
     float near_stiffness = m_pressure/10.0f;
     float stiffness = m_pressure/25.0f;
 
-    for(unsigned long i = 0; i<particle_list.size(); i++)
+    for(std::size_t i = 0; i<particle_list.size(); i++)
     {
         float density =0;
         float near_density=0;
-        std::vector<unsigned long> pneighs = neighbours(i,1);
+        std::vector<std::size_t> pneighs = neighbours(i,1);
 
         if (pneighs.size() > 0)
         {
-            for(unsigned long j = 0; j<pneighs.size(); j++) //for each particle neighbour get density and near denisty
+            for(std::size_t j = 0; j<pneighs.size(); j++) //for each particle neighbour get density and near denisty
             {
-                unsigned long neigh = pneighs[j];
+                std::size_t neigh = pneighs[j];
                 ngl::Vec3 bv = between_vector(particle_list[i],particle_list[neigh]);
                 float q = bv.length()/m_interaction_radius;
                 density += (1-q)*(1-q);
@@ -288,9 +288,9 @@ void World::double_density_relaxation()
             float near_pressure = near_stiffness*near_density; //stifness near = 0.01
             ngl::Vec3 dx;
 
-            for(unsigned long j = 0; j<pneighs.size(); j++) //for each particle neighbour apply displacements
+            for(std::size_t j = 0; j<pneighs.size(); j++) //for each particle neighbour apply displacements
             {
-                unsigned long neigh = pneighs[j];
+                std::size_t neigh = pneighs[j];
                 ngl::Vec3 bv = between_vector(particle_list[i],particle_list[neigh]);
 
                 float q =0;
@@ -313,24 +313,24 @@ void World::double_density_relaxation()
     }
 }
 
-void World::add_deform_springs(unsigned long i)
+void World::add_deform_springs(std::size_t i)
 {
-    std::vector<unsigned long> pneighs = neighbours(i,0);
+    std::vector<std::size_t> pneighs = neighbours(i,0);
     if (pneighs.size() > 0)
     {
 
-        for(unsigned long j = 0; j<pneighs.size(); j++) //for each particle neighbour
+        for(std::size_t j = 0; j<pneighs.size(); j++) //for each particle neighbour
         {
             if (particle_list[i]._springs.count(static_cast<int>(j)) == 0) //no spring present
             {
-                unsigned long neigh = pneighs[j]; //index in particle_list
+                std::size_t neigh = pneighs[j]; //index in particle_list
                 particle_list[i]._springs[static_cast<int>(neigh)] = 0.1f; //add spring length 0.1f
             }
         }
 
         for(std::map<int,float>::iterator it = particle_list[i]._springs.begin(); it !=particle_list[i]._springs.end(); it++) //iterate over spring map
         {
-            ngl::Vec3 bv = between_vector(particle_list[i],particle_list[static_cast<unsigned long>(it->first)]);
+            ngl::Vec3 bv = between_vector(particle_list[i],particle_list[static_cast<std::size_t>(it->first)]);
             float d = 0.1f*it->second; //yield ratio =0.1
             float length = bv.length();
             if (length > (it->second + d))
@@ -347,12 +347,12 @@ void World::add_deform_springs(unsigned long i)
     }
 }
 
-void World::remove_springs(unsigned long i)
+void World::remove_springs(std::size_t i)
 {
    for(std::map<int,float>::iterator it = particle_list[i]._springs.begin(); it != particle_list[i]._springs.end(); it++)
    {
        int neigh = it->first;
-       float dist = between_vector(particle_list[i],particle_list[static_cast<unsigned long>(neigh)]).length();
+       float dist = between_vector(particle_list[i],particle_list[static_cast<std::size_t>(neigh)]).length();
        if (dist >m_interaction_radius)
        {
            particle_list[i]._springs.erase(it);
@@ -363,7 +363,7 @@ void World::remove_springs(unsigned long i)
 
 void World::adjust_springs()
 {
-    for(unsigned long i = 0; i<particle_list.size(); i++)
+    for(std::size_t i = 0; i<particle_list.size(); i++)
     {
         remove_springs(i);
 
@@ -373,16 +373,15 @@ void World::adjust_springs()
 
 void World::spring_displacements()
 {
-        std::cout << "dispalcing springs "<< std::endl;
     adjust_springs();
-    for(unsigned long i = 0; i<particle_list.size(); i++)
+    for(std::size_t i = 0; i<particle_list.size(); i++)
     {
         for(std::map<int,float>::iterator it = particle_list[i]._springs.begin(); it !=particle_list[i]._springs.end(); it++)
         {
-            ngl::Vec3 bv = between_vector(particle_list[i],particle_list[static_cast<unsigned long>(it->first)]);
+            ngl::Vec3 bv = between_vector(particle_list[i],particle_list[static_cast<std::size_t>(it->first)]);
             ngl::Vec3 D = time_step*time_step*m_elasticity*(1-(it->second / m_interaction_radius))*(it->second - bv.length())*bv;
             particle_list[i].set_position(particle_list[i].get_position()-(D/2.0f));
-            particle_list[static_cast<unsigned long>(it->first)].set_position(particle_list[static_cast<unsigned long>(it->first)].get_position()+(D/2.0f));
+            particle_list[static_cast<std::size_t>(it->first)].set_position(particle_list[static_cast<std::size_t>(it->first)].get_position()+(D/2.0f));
         }
     }
 }

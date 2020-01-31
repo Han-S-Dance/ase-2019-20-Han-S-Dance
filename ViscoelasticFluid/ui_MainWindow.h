@@ -341,6 +341,7 @@ public:
 
         m_gravity = new QDoubleSpinBox(layoutWidget6);
         m_gravity->setObjectName(QString::fromUtf8("m_gravity"));
+        m_gravity->setMinimum(-1.000000000000000);
         m_gravity->setMaximum(1.000000000000000);
         m_gravity->setSingleStep(0.010000000000000);
         m_gravity->setValue(0.000000000000000);

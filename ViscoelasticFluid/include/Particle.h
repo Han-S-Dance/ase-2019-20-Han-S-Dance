@@ -1,3 +1,9 @@
+/// \brief encapsulates a particle object with possible spring
+/// \author Han Dance
+/// \version 3.0
+/// \date 30/1/20 Updated to NCCA Coding standard#ifndef Particle_H
+/// /// Revision History :
+/// Initial Version 10/11/19
 #ifndef Particle_H
 #define Particle_H
 
@@ -23,6 +29,7 @@ class Particle
     void setX_position(float);
     void setY_position(float);
     void setZ_position(float);
+
     const ngl::Vec3 &get_position() const noexcept;
     void update_lastposition();
     ngl::Vec3 get_lastposition();

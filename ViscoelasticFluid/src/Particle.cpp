@@ -1,5 +1,12 @@
-#include "Particle.h"
+///
+///  @file Particle.cpp
+///  @brief Creates a particle with different attributes.
+
+
 #include <iostream>
+#include "Particle.h"
+
+//Additional File Includes
 #include <ngl/NGLStream.h>
 #include <ngl/Vec3.h>
 

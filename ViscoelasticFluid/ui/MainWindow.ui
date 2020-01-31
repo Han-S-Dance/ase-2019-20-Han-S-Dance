@@ -424,6 +424,9 @@
          </item>
          <item>
           <widget class="QDoubleSpinBox" name="m_gravity">
+           <property name="minimum">
+            <double>-1.000000000000000</double>
+           </property>
            <property name="maximum">
             <double>1.000000000000000</double>
            </property>

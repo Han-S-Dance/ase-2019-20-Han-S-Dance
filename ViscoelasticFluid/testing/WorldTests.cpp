@@ -11,7 +11,7 @@ using namespace ::testing;
 
 TEST(World, userctor)
 {
-    World w(10);
+    World w(10,1,0);
     EXPECT_EQ(w.particle_list.size(),10);
     for (unsigned long i=0 ; i<10 ; i++ )
         EXPECT_NE(w.particle_list[i].get_position(),ngl::Vec3());
@@ -20,14 +20,14 @@ TEST(World, userctor)
 
 TEST(World, hash_function)
 {
-    World w(0);
-    EXPECT_EQ(w.hash_function(ngl::Vec3(-6.4f,-9.1f,0.0f)),std::make_tuple(-16.0f,-23.0f,0.0f));
+    World w(0,1,0);
+    EXPECT_EQ(w.hash_function(ngl::Vec3(-6.4f,-9.1f,0.0f)),std::make_tuple(-11.0f,-16.0f,0.0f));
 }
 
 
 TEST(World, map_size)
 {
-    World w(3);
+    World w(3,1,0);
     w.particle_list[0].set_position(ngl::Vec3(9.0f,1.0f,2.0f));
     w.particle_list[1].set_position(ngl::Vec3(2.1f,2.5f,2.5f));
     w.particle_list[2].set_position(ngl::Vec3(2.2f,2.6f,2.6f));
@@ -51,7 +51,7 @@ TEST(World, map_size)
 
 TEST(World, getvelocity)
 {
-    World w(10);
+    World w(10,1,0);
     for (unsigned long i=0 ; i<10 ; i++ )
         w.particle_list[i].set_velocity(ngl::Vec3(0.0f,1.0f,2.0f) );
     for (unsigned long i=0 ; i<10 ; i++ )
@@ -61,16 +61,17 @@ TEST(World, getvelocity)
 
 TEST(World, gravity)
 {
-    World w(1);
+    World w(1,1,0);
     w.particle_list[0].set_velocity(ngl::Vec3());
+    w.m_gravityscale =1.0f;
     w.apply_gravity();
     EXPECT_EQ(w.particle_list[0].get_velocity(),ngl::Vec3(0.0f,-0.32667f,0.0f));
 }
 
 TEST(World, position_update)
 {
-    World w(1);
-    w.particle_list[0].set_velocity(ngl::Vec3());
+    World w(1,1,0);
+    w.m_gravityscale =1.0f;
     w.apply_gravity();
     w.particle_list[0].set_position(ngl::Vec3());
     w.update_position();
@@ -80,7 +81,7 @@ TEST(World, position_update)
 
 TEST(World, velocity_update)
 {
-    World w(10);
+    World w(10,1,0);
     for (unsigned long i=0 ; i<10 ; i++ )
     {
         w.particle_list[i].set_position(ngl::Vec3(10.0f,10.0f,10.0f));
@@ -96,19 +97,19 @@ TEST(World, velocity_update)
 
 TEST(World, map_neighbour)
 {
-    World w(4);
+    World w(4,1,0);
     w.particle_list[0].set_position(ngl::Vec3(0.0f,0.0f,0.0f));
     w.particle_list[1].set_position(ngl::Vec3(0.1f,0.1f,0.1f));
     w.particle_list[2].set_position(ngl::Vec3(0.1f,0.2f,0.2f));
     w.particle_list[3].set_position(ngl::Vec3(0.5f,0.2f,0.2f));
     w.update_map();
     std::vector<std::size_t> cube_neighbours = w.map_neighbours(0);
-    EXPECT_EQ(cube_neighbours.size(),3); //includes self
+    EXPECT_EQ(cube_neighbours.size(),4); //includes self
 }
 
 TEST(World, neighbours)
 {
-    World w(4);
+    World w(4,1,0);
     w.particle_list[0].set_position(ngl::Vec3(0.0f,0.0f,0.0f));
     w.particle_list[1].set_position(ngl::Vec3(0.1f,0.1f,0.1f));
     w.particle_list[2].set_position(ngl::Vec3(0.1f,0.2f,0.2f));
@@ -122,7 +123,7 @@ TEST(World, neighbours)
 
 TEST(World, after_neighbours)
 {
-    World w(4);
+    World w(4,1,0);
     w.particle_list[0].set_position(ngl::Vec3(0.0f,0.0f,0.0f));
     w.particle_list[1].set_position(ngl::Vec3(0.1f,0.1f,0.1f));
     w.particle_list[2].set_position(ngl::Vec3(0.1f,0.2f,0.2f));
@@ -136,7 +137,7 @@ TEST(World, after_neighbours)
 
 TEST(World, visocisty_one)
 {
-    World w(1);
+    World w(1,1,0);
     w.particle_list[0].set_velocity(ngl::Vec3());
     w.apply_viscosity();
     EXPECT_EQ(w.particle_list[0].get_velocity(),ngl::Vec3());
@@ -144,7 +145,7 @@ TEST(World, visocisty_one)
 
 TEST(World, between_vector)
 {
-    World w(2);
+    World w(2,1,0);
     w.particle_list[0].set_position(ngl::Vec3(-0.1f,0.0f,0.0f));
     w.particle_list[1].set_position(ngl::Vec3(0.0f,0.0f,0.0f));
     ngl::Vec3 bv = w.between_vector(w.particle_list[0],w.particle_list[1]);
@@ -154,7 +155,7 @@ TEST(World, between_vector)
 
 TEST(World, viscocity)
 {
-    World w(2);
+    World w(2,1,0);
     w.particle_list[0].set_position(ngl::Vec3(0.0f,0.0f,0.0f));
     w.particle_list[0].set_velocity(ngl::Vec3(1.0f,1.0f,1.0f));
     w.particle_list[1].set_position(ngl::Vec3(0.1f,0.0f,0.0f));
@@ -167,21 +168,21 @@ TEST(World, viscocity)
 
 TEST(World, outisde_tank)
 {
-    World w(1);
+    World w(1,1,0);
     w.particle_list[0].set_position(ngl::Vec3(1.0f,-0.8f,0.0f));
     EXPECT_EQ(w.outside_tank(w.particle_list[0]),true);
 }
 
 TEST(World, inside_tank)
 {
-    World w(1);
+    World w(1,1,0);
     w.particle_list[0].set_position(ngl::Vec3(1.0f,0.1f,0.3f));
     EXPECT_EQ(w.outside_tank(w.particle_list[0]),false);
 }
 
 TEST(World, tank_border)
 {
-    World w(2);
+    World w(2,1,0);
     w.particle_list[0].set_position(ngl::Vec3(1.2f,0.0f,0.0f));
     EXPECT_EQ(w.outside_tank(w.particle_list[0]),false);
     w.particle_list[1].set_position(ngl::Vec3(1.2001f,0.0f,0.0f));
@@ -190,7 +191,7 @@ TEST(World, tank_border)
 
 TEST(World, collision_point)
 {
-    World w(1);
+    World w(1,1,0);
     w.particle_list[0].set_position(ngl::Vec3(-0.1f,0.0f,0.0f));
     w.particle_list[0].update_lastposition();
     w.particle_list[0].set_position(ngl::Vec3(2.0f,0.0f,0.0f));
@@ -199,7 +200,7 @@ TEST(World, collision_point)
 
 TEST(World, collision_point_complex)
 {
-    World w(1);
+    World w(1,1,0);
     Particle p;
     w.particle_list[0].set_position(ngl::Vec3(-0.1f,0.1f,1.0f));
     w.particle_list[0].update_lastposition();
@@ -210,7 +211,7 @@ TEST(World, collision_point_complex)
 
 TEST(World, update_tank_collision)
 {
-    World w(1);
+    World w(1,1,0);
     w.particle_list[0].set_position(ngl::Vec3(-1.0f,0.0f,0.0f));
     w.particle_list[0].update_lastposition();
     w.particle_list[0].set_position(ngl::Vec3(-20.0f,0.0f,0.0f));
@@ -222,7 +223,7 @@ TEST(World, update_tank_collision)
 
 TEST(World, double_denisty)
 {
-    World w(10);
+    World w(10,1,0);
     for(unsigned long i = 0; i<w.particle_list.size(); i++) //for each particle in particle_list
     {
         w.particle_list[i].set_position(ngl::Vec3(1.0f + i*0.001f, 0.0f, 0.0f));
@@ -235,7 +236,7 @@ TEST(World, double_denisty)
 
 TEST(World, remove_springs)
 {
-    World w(2);
+    World w(2,1,0);
     w.particle_list[0].set_position(ngl::Vec3());
     w.particle_list[1].set_position(ngl::Vec3(0.1f,0.0f,0.0f));
     w.update_map();
@@ -252,7 +253,7 @@ TEST(World, remove_springs)
 
 TEST(World, springs)
 {
-    World w(100);
+    World w(100,1,0);
     for(unsigned long i = 0; i<w.particle_list.size(); i++) //for each particle in particle_list
     {
         w.particle_list[i].set_position(ngl::Vec3(0.0f - i*0.001f, 0.001f, 0.0f));
@@ -267,7 +268,7 @@ TEST(World, springs)
 
 TEST(World, one_spring)
 {
-    World w(2);
+    World w(2,1,0);
     w.particle_list[0].set_position(ngl::Vec3());
     w.particle_list[1].set_position(ngl::Vec3(0.05f,0.0f,0.0f));
     w.spring_displacements();

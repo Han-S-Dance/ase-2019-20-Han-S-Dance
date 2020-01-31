@@ -3,6 +3,7 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 #include <QGuiApplication>
+
 NGLScene::NGLScene( QWidget *_parent ) : QOpenGLWidget( _parent )
 {
   setFocus();
@@ -40,9 +41,7 @@ void NGLScene::loadMatricesToShader(ngl::Transformation &_tx)
 {
   ngl::ShaderLib* shader = ngl::ShaderLib::instance();
   shader->use(ngl::nglColourShader);
-
-   //ngl::Mat4 MVP = m_projection * m_view * m_transform;
-   shader->setUniform("MVP", m_projection*m_view*m_globalMouseTX*_tx.getMatrix());
+  shader->setUniform("MVP", m_projection*m_view*m_globalMouseTX*_tx.getMatrix());
 
 }
 
